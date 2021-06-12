@@ -1,0 +1,20 @@
+{{.C1}}            .-/+oossssoo+/-.
+        `:+ssssssssssssssssss+:`
+      -+ssssssssssssssssssyyssss+-
+    .ossssssssssssssssss{{.C2}}dMMMNy{{.C1}}sssso.
+   /sssssssssss{{.C2}}hdmmNNmmyNMMMMh{{.C1}}ssssss/
+  +sssssssss{{.C2}}hm{{.C1}}yd{{.C2}}MMMMMMMNddddy{{.C1}}ssssssss+
+ /ssssssss{{.C2}}hNMMM{{.C1}}yh{{.C2}}hyyyyhmNMMMNh{{.C1}}ssssssss/
+.ssssssss{{.C2}}dMMMNh{{.C1}}ssssssssss{{.C2}}hNMMMd{{.C1}}ssssssss.
++ssss{{.C2}}hhhyNMMNy{{.C1}}ssssssssssss{{.C2}}yNMMMy{{.C1}}sssssss+
+oss{{.C2}}yNMMMNyMMh{{.C1}}ssssssssssssss{{.C2}}hmmmh{{.C1}}ssssssso
+oss{{.C2}}yNMMMNyMMh{{.C1}}sssssssssssssshmmmh{{.C1}}ssssssso
++ssss{{.C2}}hhhyNMMNy{{.C1}}ssssssssssss{{.C2}}yNMMMy{{.C1}}sssssss+
+.ssssssss{{.C2}}dMMMNh{{.C1}}ssssssssss{{.C2}}hNMMMd{{.C1}}ssssssss.
+ /ssssssss{{.C2}}hNMMM{{.C1}}yh{{.C2}}hyyyyhdNMMMNh{{.C1}}ssssssss/
+  +sssssssss{{.C2}}dm{{.C1}}yd{{.C2}}MMMMMMMMddddy{{.C1}}ssssssss+
+   /sssssssssss{{.C2}}hdmNNNNmyNMMMMh{{.C1}}ssssss/
+    .ossssssssssssssssss{{.C2}}dMMMNy{{.C1}}sssso.
+      -+sssssssssssssssss{{.C2}}yyy{{.C1}}ssss+-
+        `:+ssssssssssssssssss+:`
+            .-/+oossssoo+/-.
