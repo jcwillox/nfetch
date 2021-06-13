@@ -1,6 +1,7 @@
 package sysinfo
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/reujab/wallpaper"
 	"github.com/shirou/gopsutil/cpu"
@@ -87,6 +88,20 @@ func Disk() ([]*disk.UsageStat, error) {
 	}
 
 	return usages, err
+}
+
+func Weather() (string, error) {
+	resp, err := http.Get("http://wttr.in/?format=%t+-+%C+(%l)")
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	body = bytes.TrimPrefix(body, []byte("+"))
+	return string(body), nil
 }
 
 func PublicIP() (net.IP, error) {

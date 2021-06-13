@@ -55,7 +55,7 @@ var funcMap = map[string]func(config LineConfig) (string, error){
 	LineSwap:   Swap,
 	//LineBattery:
 	//LineLocale:
-	//LineWeather:
+	LineWeather:  Weather,
 	LineLocalIP:  LocalIP,
 	LinePublicIP: PublicIP,
 }
@@ -76,6 +76,7 @@ var defaultTitleMap = map[string]string{
 	LineUsage:       "CPU Usage",
 	LineMemory:      "Memory",
 	LineSwap:        "Swap",
+	LineWeather:     "Weather",
 	LineLocalIP:     "Local IP",
 	LinePublicIP:    "Public IP",
 }
@@ -185,6 +186,10 @@ func Swap(config LineConfig) (string, error) {
 	used, unit := BytesToHuman(float64(swap.Used), 2, "GiB")
 	total, unitTotal := BytesToHuman(float64(swap.Total), 2, "GiB")
 	return fmt.Sprintf("%s %s / %s %s (%.f%%)", used, unit, total, unitTotal, swap.UsedPercent), err
+}
+
+func Weather(config LineConfig) (string, error) {
+	return sysinfo.Weather()
 }
 
 func LocalIP(config LineConfig) (string, error) {
