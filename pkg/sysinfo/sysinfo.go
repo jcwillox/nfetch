@@ -6,8 +6,8 @@ import (
 	"github.com/reujab/wallpaper"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
-	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/mem"
+	"github.com/shirou/gopsutil/process"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -17,21 +17,17 @@ import (
 	"time"
 )
 
-// cache host-info as it's commonly used
-// we ignore synchronisation as we expect that host-info will
-// always be called before starting any goroutines
-var hostInfo *host.InfoStat
+func Hostname() string {
+	hostname, _ := os.Hostname()
+	return hostname
+}
 
-func HostInfo() *host.InfoStat {
-	if hostInfo != nil {
-		return hostInfo
-	}
-	info, err := host.Info()
+func NumProcs() (int, error) {
+	pids, err := process.Pids()
 	if err != nil {
-		panic(fmt.Errorf("Fatal unable to retrieve host info: %s \n", err))
+		return 0, err
 	}
-	hostInfo = info
-	return hostInfo
+	return len(pids), nil
 }
 
 func Username() string {

@@ -3,6 +3,7 @@ package lines
 import (
 	"fmt"
 	"github.com/logrusorgru/aurora/v3"
+	"github.com/shirou/gopsutil/host"
 	"nfetch/internal/color"
 	"nfetch/pkg/sysinfo"
 	. "nfetch/pkg/utils"
@@ -110,28 +111,45 @@ var allLines = []interface{}{
 }
 
 func Title() (string, error) {
-	return fmt.Sprintf("%s@%s", aurora.Colorize(sysinfo.Username(), color.Colors.C1), aurora.Colorize(sysinfo.HostInfo().Hostname, color.Colors.C1)), nil
+	return fmt.Sprintf("%s@%s", aurora.Colorize(sysinfo.Username(), color.Colors.C1), aurora.Colorize(sysinfo.Hostname(), color.Colors.C1)), nil
 }
 
 func Dashes() (string, error) {
-	return strings.Repeat("-", len(sysinfo.Username())+len(sysinfo.HostInfo().Hostname)+1), nil
+	return strings.Repeat("-", len(sysinfo.Username())+len(sysinfo.Hostname())+1), nil
 }
 
 func OS(config LineConfig) (string, error) {
 	name := sysinfo.Distro()
-	info := sysinfo.HostInfo()
-	if strings.Contains(info.KernelVersion, "microsoft") {
-		name += " on Windows 10"
+	if runtime.GOOS != "windows" {
+		kernelVersion, err := host.KernelVersion()
+		if err != nil {
+			return "", err
+		}
+		if strings.Contains(kernelVersion, "microsoft") {
+			name += " on Windows 10"
+		}
 	}
-	return fmt.Sprintf("%s [%s]", name, sysinfo.HostInfo().KernelArch), nil
+	kernelArch, err := host.KernelArch()
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s [%s]", name, kernelArch), nil
 }
 
 func Kernel(config LineConfig) (string, error) {
-	return sysinfo.HostInfo().KernelVersion, nil
+	kernelVersion, err := host.KernelVersion()
+	if err != nil {
+		return "", err
+	}
+	return kernelVersion, nil
 }
 
 func Uptime(config LineConfig) (string, error) {
-	return ToHumanTime(sysinfo.HostInfo().Uptime), nil
+	uptime, err := host.Uptime()
+	if err != nil {
+		return "", err
+	}
+	return ToHumanTime(uptime), nil
 }
 
 func Usage(config LineConfig) (string, error) {
@@ -139,7 +157,11 @@ func Usage(config LineConfig) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%.f%% (%d processes)", usage, sysinfo.HostInfo().Procs), nil
+	procs, err := sysinfo.NumProcs()
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%.f%% (%d processes)", usage, procs), nil
 }
 
 func CPU(config LineConfig) (string, error) {

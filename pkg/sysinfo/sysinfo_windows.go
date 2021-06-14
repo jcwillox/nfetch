@@ -5,6 +5,7 @@ package sysinfo
 import (
 	"github.com/StackExchange/wmi"
 	"github.com/miekg/dns"
+	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/mem"
 	"golang.org/x/sys/windows/registry"
 	"net"
@@ -48,7 +49,11 @@ func CPUName() (string, error) {
 }
 
 func Distro() string {
-	return strings.TrimPrefix(HostInfo().Platform, "Microsoft ")
+	platform, _, _, err := host.PlatformInformation()
+	if err != nil {
+		return ""
+	}
+	return strings.TrimPrefix(platform, "Microsoft ")
 }
 
 func Motherboard() (Win32Baseboard, error) {
