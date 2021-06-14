@@ -7,6 +7,7 @@ require (
 	github.com/Xuanwo/go-locale v1.0.0
 	github.com/anthonynsimon/bild v0.13.0
 	github.com/bi-zone/wmi v1.1.4 // indirect
+	github.com/distatus/battery v0.10.0
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/k0kubun/pp/v3 v3.0.7
 	github.com/kbinani/screenshot v0.0.0-20210326165202-b96eb3309bb0

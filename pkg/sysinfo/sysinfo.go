@@ -3,6 +3,7 @@ package sysinfo
 import (
 	"bytes"
 	"github.com/Xuanwo/go-locale"
+	"github.com/distatus/battery"
 	"github.com/kbinani/screenshot"
 	"github.com/reujab/wallpaper"
 	"github.com/shirou/gopsutil/cpu"
@@ -96,6 +97,29 @@ func Disk() ([]*disk.UsageStat, error) {
 	}
 
 	return usages, err
+}
+
+func Battery() (*battery.Battery, error) {
+	batteries, err := battery.GetAll()
+	if err != nil || len(batteries) == 0 {
+		return nil, err
+	}
+
+	b := batteries[0]
+	for _, bt := range batteries[1:] {
+		b.Full += bt.Full
+		b.Current += bt.Current
+
+		// if a battery is charging only drop the state if a battery is discharging
+		if b.State == battery.Charging {
+			if bt.State == battery.Discharging {
+				b.State = battery.Discharging
+			}
+		} else if b.State != battery.Discharging {
+			b.State = bt.State
+		}
+	}
+	return b, err
 }
 
 func Locale() (language.Tag, error) {

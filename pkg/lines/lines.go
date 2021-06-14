@@ -49,13 +49,13 @@ var funcMap = map[string]func(config LineConfig) (string, error){
 	//LineShell:
 	LineResolution: Resolution,
 	//LineTerminal:
-	LineTheme:  Theme,
-	LineCPU:    CPU,
-	LineGPU:    GPU,
-	LineUsage:  Usage,
-	LineMemory: Memory,
-	LineSwap:   Swap,
-	//LineBattery:
+	LineTheme:    Theme,
+	LineCPU:      CPU,
+	LineGPU:      GPU,
+	LineUsage:    Usage,
+	LineMemory:   Memory,
+	LineSwap:     Swap,
+	LineBattery:  Battery,
 	LineLocale:   Locale,
 	LineWeather:  Weather,
 	LineLocalIP:  LocalIP,
@@ -78,6 +78,7 @@ var defaultTitleMap = map[string]string{
 	LineUsage:       "CPU Usage",
 	LineMemory:      "Memory",
 	LineSwap:        "Swap",
+	LineBattery:     "Battery",
 	LineLocale:      "Locale",
 	LineWeather:     "Weather",
 	LineLocalIP:     "Local IP",
@@ -222,6 +223,17 @@ func Swap(config LineConfig) (string, error) {
 	used, unit := BytesToHuman(float64(swap.Used), 2, "GiB")
 	total, unitTotal := BytesToHuman(float64(swap.Total), 2, "GiB")
 	return fmt.Sprintf("%s %s / %s %s (%.f%%)", used, unit, total, unitTotal, swap.UsedPercent), err
+}
+
+func Battery(config LineConfig) (string, error) {
+	bt, err := sysinfo.Battery()
+	if err != nil {
+		return "", err
+	}
+	if bt == nil {
+		return "(none)", nil
+	}
+	return fmt.Sprintf("%.f%% (%s)", bt.Current/bt.Full*100, bt.State), nil
 }
 
 func Locale(config LineConfig) (string, error) {
