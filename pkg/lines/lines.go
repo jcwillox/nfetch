@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/logrusorgru/aurora/v3"
 	"nfetch/internal/color"
-	. "nfetch/pkg"
 	"nfetch/pkg/sysinfo"
+	. "nfetch/pkg/utils"
 	"strings"
 )
 

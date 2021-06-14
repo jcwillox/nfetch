@@ -1,4 +1,4 @@
-package pkg
+package lines
 
 import "github.com/spf13/cast"
 

@@ -2,8 +2,6 @@
 
 package lines
 
-import . "nfetch/pkg"
-
 func Motherboard(config LineConfig) (string, error) {
 	return "(not implemented)", nil
 }

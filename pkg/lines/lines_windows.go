@@ -4,7 +4,6 @@ package lines
 
 import (
 	"fmt"
-	. "nfetch/pkg"
 	"nfetch/pkg/sysinfo"
 )
 
