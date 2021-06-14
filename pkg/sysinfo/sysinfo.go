@@ -2,12 +2,14 @@ package sysinfo
 
 import (
 	"bytes"
+	"github.com/Xuanwo/go-locale"
 	"github.com/kbinani/screenshot"
 	"github.com/reujab/wallpaper"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/process"
+	"golang.org/x/text/language"
 	"image"
 	"io/ioutil"
 	"net"
@@ -94,6 +96,10 @@ func Disk() ([]*disk.UsageStat, error) {
 	}
 
 	return usages, err
+}
+
+func Locale() (language.Tag, error) {
+	return locale.Detect()
 }
 
 func Weather() (string, error) {

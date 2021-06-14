@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46
+	github.com/Xuanwo/go-locale v1.0.0
 	github.com/anthonynsimon/bild v0.13.0
 	github.com/bi-zone/wmi v1.1.4 // indirect
 	github.com/go-ole/go-ole v1.2.5 // indirect
@@ -20,6 +21,7 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/tklauser/go-sysconf v0.3.6 // indirect
 	golang.org/x/sys v0.0.0-20210611083646-a4fc73990273
+	golang.org/x/text v0.3.6
 )
 
 replace github.com/k0kubun/pp/v3 v3.0.7 => github.com/k0kubun/pp/v3 v3.0.8-0.20210415165650-b87d88f85b84

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/shirou/gopsutil/host"
+	"golang.org/x/text/language/display"
 	"nfetch/internal/color"
 	"nfetch/pkg/sysinfo"
 	. "nfetch/pkg/utils"
@@ -55,7 +56,7 @@ var funcMap = map[string]func(config LineConfig) (string, error){
 	LineMemory: Memory,
 	LineSwap:   Swap,
 	//LineBattery:
-	//LineLocale:
+	LineLocale:   Locale,
 	LineWeather:  Weather,
 	LineLocalIP:  LocalIP,
 	LinePublicIP: PublicIP,
@@ -77,6 +78,7 @@ var defaultTitleMap = map[string]string{
 	LineUsage:       "CPU Usage",
 	LineMemory:      "Memory",
 	LineSwap:        "Swap",
+	LineLocale:      "Locale",
 	LineWeather:     "Weather",
 	LineLocalIP:     "Local IP",
 	LinePublicIP:    "Public IP",
@@ -220,6 +222,14 @@ func Swap(config LineConfig) (string, error) {
 	used, unit := BytesToHuman(float64(swap.Used), 2, "GiB")
 	total, unitTotal := BytesToHuman(float64(swap.Total), 2, "GiB")
 	return fmt.Sprintf("%s %s / %s %s (%.f%%)", used, unit, total, unitTotal, swap.UsedPercent), err
+}
+
+func Locale(config LineConfig) (string, error) {
+	locale, err := sysinfo.Locale()
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s [%s]", display.English.Tags().Name(locale), locale.String()), nil
 }
 
 func Weather(config LineConfig) (string, error) {
