@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46
 	github.com/anthonynsimon/bild v0.13.0
+	github.com/bi-zone/wmi v1.1.4 // indirect
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/k0kubun/pp/v3 v3.0.7
 	github.com/logrusorgru/aurora/v3 v3.0.0
@@ -21,3 +22,8 @@ require (
 )
 
 replace github.com/k0kubun/pp/v3 v3.0.7 => github.com/k0kubun/pp/v3 v3.0.8-0.20210415165650-b87d88f85b84
+
+replace (
+	github.com/StackExchange/wmi => github.com/bi-zone/wmi v1.1.4
+	github.com/bi-zone/wmi v1.1.4 => github.com/jeffreystoke/wmi v1.1.5-0.20201112194144-6556453f893c
+)
