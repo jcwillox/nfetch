@@ -10,6 +10,7 @@ import (
 	"golang.org/x/sys/windows/registry"
 	"net"
 	"strings"
+	"sync"
 )
 
 const wqlBaseboard = "SELECT Manufacturer, Product FROM Win32_BaseBoard"
@@ -36,12 +37,29 @@ type Win32PageFile struct {
 	AllocatedBaseSize *uint64
 }
 
-func init() {
-	sWbemServices, err := wmi.InitializeSWbemServices(wmi.DefaultClient)
-	if err != nil {
-		panic(err)
+var connection *wmi.SWbemServicesConnection
+var wmiLock sync.Mutex
+
+func WmiSharedConnection() *wmi.SWbemServicesConnection {
+	wmiLock.Lock()
+	defer wmiLock.Unlock()
+	if connection != nil {
+		return connection
 	}
-	wmi.DefaultClient.SWbemServicesClient = sWbemServices
+	if wmi.DefaultClient.SWbemServicesClient == nil {
+		sWbemServices, err := wmi.NewSWbemServices()
+		if err != nil {
+			panic(fmt.Errorf("Failed creating SWbemServicesClient: %s \n", err))
+		}
+		// this is not really threadsafe
+		wmi.DefaultClient.SWbemServicesClient = sWbemServices
+	}
+	c, err := wmi.DefaultClient.SWbemServicesClient.ConnectServer()
+	if err != nil {
+		panic(fmt.Errorf("Failed creating SWbemServicesConnection: %s \n", err))
+	}
+	connection = c
+	return c
 }
 
 func CPUName() (string, error) {
@@ -58,7 +76,8 @@ func Distro() string {
 
 func Motherboard() (Win32Baseboard, error) {
 	var win32BaseboardDescriptions []Win32Baseboard
-	if err := wmi.Query(wqlBaseboard, &win32BaseboardDescriptions); err != nil {
+	conn := WmiSharedConnection()
+	if err := conn.Query(wqlBaseboard, &win32BaseboardDescriptions); err != nil {
 		return Win32Baseboard{}, err
 	}
 	if len(win32BaseboardDescriptions) > 0 {
@@ -69,7 +88,8 @@ func Motherboard() (Win32Baseboard, error) {
 
 func Model() (Win32Model, error) {
 	var win32ModelDescriptions []Win32Model
-	if err := wmi.Query(wqlModel, &win32ModelDescriptions); err != nil {
+	conn := WmiSharedConnection()
+	if err := conn.Query(wqlModel, &win32ModelDescriptions); err != nil {
 		return Win32Model{}, err
 	}
 	if len(win32ModelDescriptions) > 0 {
@@ -100,7 +120,8 @@ func Theme() (uint64, uint64, error) {
 
 func GPU() (Win32GPU, error) {
 	var win32GPUDescriptions []Win32GPU
-	if err := wmi.Query(wqlGPU, &win32GPUDescriptions); err != nil {
+	conn := WmiSharedConnection()
+	if err := conn.Query(wqlGPU, &win32GPUDescriptions); err != nil {
 		return Win32GPU{}, err
 	}
 	if len(win32GPUDescriptions) > 0 {
@@ -111,7 +132,8 @@ func GPU() (Win32GPU, error) {
 
 func Swap() (mem.SwapMemoryStat, error) {
 	var win32PageFileDescriptions []Win32PageFile
-	if err := wmi.Query(wqlPageFile, &win32PageFileDescriptions); err != nil {
+	conn := WmiSharedConnection()
+	if err := conn.Query(wqlPageFile, &win32PageFileDescriptions); err != nil {
 		return mem.SwapMemoryStat{}, err
 	}
 	if len(win32PageFileDescriptions) > 0 {
