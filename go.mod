@@ -8,6 +8,7 @@ require (
 	github.com/bi-zone/wmi v1.1.4 // indirect
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/k0kubun/pp/v3 v3.0.7
+	github.com/kbinani/screenshot v0.0.0-20210326165202-b96eb3309bb0
 	github.com/logrusorgru/aurora/v3 v3.0.0
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect

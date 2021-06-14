@@ -46,7 +46,7 @@ var funcMap = map[string]func(config LineConfig) (string, error){
 	LineUptime:      Uptime,
 	//LinePkgs:
 	//LineShell:
-	//LineResolution:
+	LineResolution: Resolution,
 	//LineTerminal:
 	LineTheme:  Theme,
 	LineCPU:    CPU,
@@ -150,6 +150,18 @@ func Uptime(config LineConfig) (string, error) {
 		return "", err
 	}
 	return ToHumanTime(uptime), nil
+}
+
+func Resolution(config LineConfig) (string, error) {
+	displays := sysinfo.Resolution()
+	if len(displays) == 0 {
+		return "(none)", nil
+	}
+	parts := make([]string, len(displays))
+	for i, bounds := range displays {
+		parts[i] = fmt.Sprintf("%dx%d", bounds.Dx(), bounds.Dy())
+	}
+	return strings.Join(parts, ", "), nil
 }
 
 func Usage(config LineConfig) (string, error) {

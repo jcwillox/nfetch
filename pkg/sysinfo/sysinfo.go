@@ -2,12 +2,13 @@ package sysinfo
 
 import (
 	"bytes"
-	"fmt"
+	"github.com/kbinani/screenshot"
 	"github.com/reujab/wallpaper"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/process"
+	"image"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -45,6 +46,15 @@ func Username() string {
 		return filepath.Base(homeDir)
 	}
 	return "unknown"
+}
+
+func Resolution() []image.Rectangle {
+	n := screenshot.NumActiveDisplays()
+	displays := make([]image.Rectangle, n)
+	for i := 0; i < n; i++ {
+		displays[i] = screenshot.GetDisplayBounds(i)
+	}
+	return displays
 }
 
 func Usage() (float64, error) {
