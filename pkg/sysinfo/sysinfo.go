@@ -21,6 +21,10 @@ import (
 	"time"
 )
 
+var HTTPClient = http.Client{
+	Timeout: time.Second * 3,
+}
+
 func Hostname() string {
 	hostname, _ := os.Hostname()
 	return hostname
@@ -127,7 +131,7 @@ func Locale() (language.Tag, error) {
 }
 
 func Weather() (string, error) {
-	resp, err := http.Get("http://wttr.in/?format=%t+-+%C+(%l)")
+	resp, err := HTTPClient.Get("http://wttr.in/?format=%t+-+%C+(%l)")
 	if err != nil {
 		return "", err
 	}
@@ -147,7 +151,7 @@ func PublicIP() (net.IP, error) {
 	}
 
 	// if we did not find the ip using dns fallback to using http
-	resp, err := http.Get("https://myexternalip.com/raw")
+	resp, err := HTTPClient.Get("https://myexternalip.com/raw")
 	if err != nil {
 		return nil, err
 	}
