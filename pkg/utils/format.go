@@ -24,15 +24,18 @@ func ToHumanTime(seconds uint64) string {
 
 	parts := make([]string, 0, 3)
 
-	for val, name := range map[int64]string{
-		days:    "day",
-		hours:   "hour",
-		minutes: "minute",
+	for _, item := range []struct {
+		Name  string
+		Value int64
+	}{
+		{"day", days},
+		{"hour", hours},
+		{"minute", minutes},
 	} {
-		if val == 1 {
-			parts = append(parts, fmt.Sprintf("%d %s", val, name))
-		} else if val > 1 {
-			parts = append(parts, fmt.Sprintf("%d %ss", val, name))
+		if item.Value == 1 {
+			parts = append(parts, fmt.Sprintf("%d %s", item.Value, item.Name))
+		} else if item.Value > 1 {
+			parts = append(parts, fmt.Sprintf("%d %ss", item.Value, item.Name))
 		}
 	}
 
