@@ -45,7 +45,7 @@ var funcMap = map[string]func(config LineConfig) (string, error){
 	LineKernel:      Kernel,
 	LineMotherboard: Motherboard,
 	LineUptime:      Uptime,
-	//LinePkgs:
+	LinePkgs:        Pkgs,
 	//LineShell:
 	LineResolution: Resolution,
 	//LineTerminal:
@@ -153,6 +153,39 @@ func Uptime(config LineConfig) (string, error) {
 		return "", err
 	}
 	return ToHumanTime(uptime), nil
+}
+
+func Pkgs(config LineConfig) (string, error) {
+	show := config.GetStringSlice("include")
+	exclude := config.GetStringSlice("exclude")
+	if len(exclude) > 0 {
+		// we know that the slice will be at least this long
+		show = make([]string, 0, len(sysinfo.AllPkgManagers)-len(exclude))
+		for _, manager := range sysinfo.AllPkgManagers {
+			if !StringSliceContains(exclude, manager) {
+				show = append(show, manager)
+			}
+		}
+	} else {
+		if len(show) == 0 {
+			show = sysinfo.AllPkgManagers
+		}
+	}
+
+	pkgMap := sysinfo.Pkgs(show)
+	if len(pkgMap) == 0 {
+		return "(none)", nil
+	}
+
+	result := make([]string, 0, len(pkgMap))
+	for _, pkg := range show {
+		amt, ok := pkgMap[pkg]
+		if !ok {
+			continue
+		}
+		result = append(result, fmt.Sprintf("%d (%s)", amt, pkg))
+	}
+	return strings.Join(result, ", "), nil
 }
 
 func Resolution(config LineConfig) (string, error) {

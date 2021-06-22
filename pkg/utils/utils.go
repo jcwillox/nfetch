@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"bufio"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -20,4 +22,30 @@ func StripWSLPath() {
 		}
 	}
 	os.Setenv("PATH", strings.Join(newPath, string(os.PathListSeparator)))
+}
+
+func StartCommand(name string, arg ...string) (*bufio.Reader, error) {
+	cmd := exec.Command(name, arg...)
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, err
+	}
+
+	reader := bufio.NewReader(stdout)
+	err = cmd.Start()
+	if err != nil {
+		return nil, err
+	}
+
+	return reader, nil
+}
+
+func StringSliceContains(slice []string, s string) bool {
+	for _, el := range slice {
+		if el == s {
+			return true
+		}
+	}
+	return false
 }
