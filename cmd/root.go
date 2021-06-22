@@ -58,7 +58,9 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfg.File, "config", "", "config file (default ~/.config/nfetch/config.yaml)")
+	rootCmd.Flags().Bool("timing", false, "show time taken for each info line")
 	rootCmd.Flags().StringP("logo", "l", "", "show time taken for each info line")
+	viper.BindPFlag("timing", rootCmd.Flags().Lookup("timing"))
 	viper.BindPFlag("logo", rootCmd.Flags().Lookup("logo"))
 }
 

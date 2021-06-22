@@ -3,60 +3,150 @@ package lines
 import (
 	"fmt"
 	"github.com/logrusorgru/aurora/v3"
+	"github.com/spf13/viper"
 	"nfetch/internal/color"
-	. "nfetch/pkg"
+	"time"
 )
 
-// TODO: simplify / breakup function
+func RenderLines(offset string, lines []interface{}) int {
+	lineStrSlice := make([]string, 0, len(lines))
 
-func RenderLines(offset string, lines []interface{}) {
+	type Result struct {
+		Line    string
+		Title   string
+		Content string
+	}
+
+	lineResults := make(map[string]Result)
+	results := make(chan Result)
+	showTiming := viper.GetBool("timing")
+
+	var diskTitles []string
+	var diskContent []string
+
+	start := time.Now()
+
+	// start goroutines to render lines
 	for _, entry := range lines {
 		line, config := GetLineConfig(entry)
+		lineStrSlice = append(lineStrSlice, line)
+
 		switch line {
-		case LineTitle:
-			title, _ := Title()
-			fmt.Println(offset + title)
-		case LineDashes:
-			dashes, _ := Dashes()
-			fmt.Println(offset + dashes)
+		case LineTitle, LineDashes, LineColorbar, LineBlank:
+			continue
 		case LineDisk:
-			titles, contents, err := Disk(config)
-			if err != nil {
-				fmt.Print(offset, aurora.Colorize("Disk", color.Colors.C1))
-				fmt.Println(": " + color.ErrorMsg)
-			} else {
-				for i := range titles {
-					fmt.Print(offset, aurora.Colorize(titles[i], color.Colors.C1))
-					fmt.Println(": " + contents[i])
+			go func() {
+				var err error
+				diskTitles, diskContent, err = Disk(config)
+				if err != nil {
+					diskTitles = []string{"Disk"}
+					diskContent = []string{color.ErrorMsg}
 				}
-			}
-		case LineBlank:
-			fmt.Println()
-		case LineColorbar:
-			fmt.Println(offset + "\x1b[0;40m   \x1b[0;41m   \x1b[0;42m   \x1b[0;43m   \x1b[0;44m   \x1b[0;45m   \x1b[0;46m   \x1b[0;47m   \x1b[0m")
-			fmt.Println(offset + "\x1b[0;100m   \x1b[0;101m   \x1b[0;102m   \x1b[0;103m   \x1b[0;104m   \x1b[0;105m   \x1b[0;106m   \x1b[0;107m   \x1b[0m")
-		default:
-			title := config.GetString("title")
+			}()
+			continue
+		}
+
+		// get title
+		title := config.GetString("title")
+		if title == "" {
+			title = DefaultTitleMap[line]
 			if title == "" {
-				title = defaultTitleMap[line]
-				if title == "" {
-					title = line
-				}
-			}
-			fmt.Print(offset, aurora.Colorize(title, color.Colors.C1))
-			contentFunc, ok := funcMap[line]
-
-			if !ok {
-				fmt.Println(":", color.Error("(does not exist)"))
-				continue
-			}
-
-			content, err := contentFunc(config)
-			if err != nil {
-				fmt.Println(":", color.ErrorMsg)
-			} else {
-				fmt.Println(": " + content)
+				title = line
 			}
 		}
+
+		contentFunc, ok := FuncMap[line]
+
+		go func() {
+			if !ok {
+				results <- Result{
+					Line:    line,
+					Title:   title,
+					Content: color.Error("(does not exist)").String(),
+				}
+				return
+			}
+
+			start := time.Now()
+			content, err := contentFunc(config)
+			if err != nil {
+				content = color.ErrorMsg
+			}
+
+			if showTiming {
+				content = fmt.Sprint(content, aurora.Yellow(" [took "), aurora.Red(time.Since(start)).String(), aurora.Yellow("]").String())
+			}
+
+			results <- Result{
+				Line:    line,
+				Title:   title,
+				Content: content,
+			}
+		}()
 	}
+
+	// receive results
+	writtenLines := 0
+	for i := 0; i < len(lineStrSlice); i++ {
+		line := lineStrSlice[i]
+
+		switch line {
+		case LineTitle:
+			fmt.Print(offset, Title(), "\n")
+			writtenLines += 1
+		case LineDashes:
+			fmt.Print(offset, Dashes(), "\n")
+			writtenLines += 1
+		case LineBlank:
+			fmt.Println()
+			writtenLines += 1
+		case LineColorbar:
+			for _, s := range Colorbar() {
+				fmt.Print(offset, s, "\n")
+				writtenLines += 1
+			}
+
+		case LineDisk:
+			if diskTitles != nil && diskContent != nil {
+				for i := range diskTitles {
+					fmt.Print(offset, aurora.Colorize(diskTitles[i], color.Colors.C1), ": ")
+					fmt.Println(diskContent[i])
+					writtenLines += 1
+				}
+				break
+			}
+			// we haven't go disks yet so process a result
+			fallthrough
+		default:
+			// try get from map
+			if res, present := lineResults[line]; present {
+				fmt.Print(offset, aurora.Colorize(res.Title, color.Colors.C1), ": ")
+				fmt.Println(res.Content)
+				writtenLines += 1
+				break
+			}
+
+			// read a result
+			result := <-results
+			// check if current result
+			if result.Line == line {
+				fmt.Print(offset, aurora.Colorize(result.Title, color.Colors.C1), ": ")
+				fmt.Println(result.Content)
+				writtenLines += 1
+			} else {
+				i--
+			}
+
+			// otherwise get next result
+			lineResults[result.Line] = result
+
+		}
+	}
+
+	if showTiming {
+		fmt.Print(offset, "total time: ", time.Since(start), "\n")
+		writtenLines++
+	}
+
+	return writtenLines
 }

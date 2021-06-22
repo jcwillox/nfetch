@@ -113,12 +113,19 @@ var allLines = []interface{}{
 	LineColorbar,
 }
 
-func Title() (string, error) {
-	return fmt.Sprintf("%s@%s", aurora.Colorize(sysinfo.Username(), color.Colors.C1), aurora.Colorize(sysinfo.Hostname(), color.Colors.C1)), nil
+func Title() string {
+	return fmt.Sprintf("%s@%s", aurora.Colorize(sysinfo.Username(), color.Colors.C1), aurora.Colorize(sysinfo.Hostname(), color.Colors.C1))
 }
 
-func Dashes() (string, error) {
-	return strings.Repeat("-", len(sysinfo.Username())+len(sysinfo.Hostname())+1), nil
+func Dashes() string {
+	return strings.Repeat("-", len(sysinfo.Username())+len(sysinfo.Hostname())+1)
+}
+
+func Colorbar() []string {
+	return []string{
+		"\x1b[0;40m   \x1b[0;41m   \x1b[0;42m   \x1b[0;43m   \x1b[0;44m   \x1b[0;45m   \x1b[0;46m   \x1b[0;47m   \x1b[0m",
+		"\x1b[0;100m   \x1b[0;101m   \x1b[0;102m   \x1b[0;103m   \x1b[0;104m   \x1b[0;105m   \x1b[0;106m   \x1b[0;107m   \x1b[0m",
+	}
 }
 
 func OS(config LineConfig) (string, error) {
