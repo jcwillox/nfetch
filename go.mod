@@ -13,8 +13,10 @@ require (
 	github.com/kbinani/screenshot v0.0.0-20210326165202-b96eb3309bb0
 	github.com/logrusorgru/aurora/v3 v3.0.0
 	github.com/mattn/go-colorable v0.1.8 // indirect
-	github.com/mattn/go-isatty v0.0.13 // indirect
+	github.com/mattn/go-isatty v0.0.13
 	github.com/miekg/dns v1.1.42
+	github.com/mitchellh/go-homedir v1.1.0
+	github.com/mitchellh/go-ps v1.0.0
 	github.com/reujab/wallpaper v0.0.0-20201124162023-c3898ec30d2c
 	github.com/shirou/gopsutil v3.21.5+incompatible
 	github.com/spf13/cast v1.3.0
@@ -23,6 +25,7 @@ require (
 	github.com/tklauser/go-sysconf v0.3.6 // indirect
 	golang.org/x/sys v0.0.0-20210611083646-a4fc73990273
 	golang.org/x/text v0.3.6
+	howett.net/plist v0.0.0-20201203080718-1454fab16a06 // indirect
 )
 
 replace github.com/k0kubun/pp/v3 v3.0.7 => github.com/k0kubun/pp/v3 v3.0.8-0.20210415165650-b87d88f85b84
