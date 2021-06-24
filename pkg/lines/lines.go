@@ -8,6 +8,7 @@ import (
 	"nfetch/internal/color"
 	"nfetch/pkg/sysinfo"
 	. "nfetch/pkg/utils"
+	"runtime"
 	"strings"
 )
 
@@ -150,6 +151,9 @@ func Kernel(config LineConfig) (string, error) {
 	kernelVersion, err := host.KernelVersion()
 	if err != nil {
 		return "", err
+	}
+	if runtime.GOOS == "windows" {
+		kernelVersion = StripToEnd(kernelVersion, " Build")
 	}
 	return kernelVersion, nil
 }
