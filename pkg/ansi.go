@@ -1,16 +1,16 @@
 package pkg
 
 import (
-	"fmt"
+	"nfetch/pkg/ioutils"
 	"strconv"
 )
 
 func CursorUp(lines int) {
-	fmt.Printf("\x1b[%dA", lines)
+	ioutils.Printf("\x1b[%dA", lines)
 }
 
 func CursorDown(lines int) {
-	fmt.Printf("\x1b[%dB", lines)
+	ioutils.Printf("\x1b[%dB", lines)
 }
 
 func CursorRight(columns int) string {
@@ -18,17 +18,17 @@ func CursorRight(columns int) string {
 }
 
 func ShowCursor() {
-	fmt.Print("\x1b[?25h")
+	ioutils.Print("\x1b[?25h")
 }
 
 func HideCursor() {
-	fmt.Print("\x1b[?25l")
+	ioutils.Print("\x1b[?25l")
 }
 
 func EnableLineWrap() {
-	fmt.Print("\x1b[?7h")
+	ioutils.Print("\x1b[?7h")
 }
 
 func DisableLineWrap() {
-	fmt.Print("\x1b[?7l")
+	ioutils.Print("\x1b[?7l")
 }

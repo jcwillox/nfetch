@@ -5,6 +5,7 @@ import (
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/spf13/viper"
 	"nfetch/internal/color"
+	"nfetch/pkg/ioutils"
 	"time"
 )
 
@@ -92,25 +93,25 @@ func RenderLines(offset string, lines []interface{}) int {
 
 		switch line {
 		case LineTitle:
-			fmt.Print(offset, Title(), "\n")
+			ioutils.Print(offset, Title(), "\n")
 			writtenLines += 1
 		case LineDashes:
-			fmt.Print(offset, Dashes(), "\n")
+			ioutils.Print(offset, Dashes(), "\n")
 			writtenLines += 1
 		case LineBlank:
-			fmt.Println()
+			ioutils.Println()
 			writtenLines += 1
 		case LineColorbar:
 			for _, s := range Colorbar() {
-				fmt.Print(offset, s, "\n")
+				ioutils.Print(offset, s, "\n")
 				writtenLines += 1
 			}
 
 		case LineDisk:
 			if diskTitles != nil && diskContent != nil {
 				for i := range diskTitles {
-					fmt.Print(offset, aurora.Colorize(diskTitles[i], color.Colors.C1), ": ")
-					fmt.Println(diskContent[i])
+					ioutils.Print(offset, aurora.Colorize(diskTitles[i], color.Colors.C1), ": ")
+					ioutils.Println(diskContent[i])
 					writtenLines += 1
 				}
 				break
@@ -120,8 +121,8 @@ func RenderLines(offset string, lines []interface{}) int {
 		default:
 			// try get from map
 			if res, present := lineResults[line]; present {
-				fmt.Print(offset, aurora.Colorize(res.Title, color.Colors.C1), ": ")
-				fmt.Println(res.Content)
+				ioutils.Print(offset, aurora.Colorize(res.Title, color.Colors.C1), ": ")
+				ioutils.Println(res.Content)
 				writtenLines += 1
 				break
 			}
@@ -130,8 +131,8 @@ func RenderLines(offset string, lines []interface{}) int {
 			result := <-results
 			// check if current result
 			if result.Line == line {
-				fmt.Print(offset, aurora.Colorize(result.Title, color.Colors.C1), ": ")
-				fmt.Println(result.Content)
+				ioutils.Print(offset, aurora.Colorize(result.Title, color.Colors.C1), ": ")
+				ioutils.Println(result.Content)
 				writtenLines += 1
 			} else {
 				i--
@@ -144,7 +145,7 @@ func RenderLines(offset string, lines []interface{}) int {
 	}
 
 	if showTiming {
-		fmt.Print(offset, "total time: ", time.Since(start), "\n")
+		ioutils.Print(offset, "total time: ", time.Since(start), "\n")
 		writtenLines++
 	}
 

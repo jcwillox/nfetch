@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"nfetch/internal/color"
 	. "nfetch/pkg"
+	"nfetch/pkg/ioutils"
 	"nfetch/pkg/lines"
 	"nfetch/pkg/logo"
 	"nfetch/pkg/sysinfo"
@@ -27,9 +28,6 @@ var rootCmd = &cobra.Command{
 	Short:   "A truly cross-platform alternative to neofetch",
 	Version: "0.0.1",
 	Run: func(cmd *cobra.Command, args []string) {
-		// prefetch host info
-		sysinfo.HostInfo()
-
 		HideCursor()
 		DisableLineWrap()
 		defer ShowCursor()
@@ -65,7 +63,7 @@ var rootCmd = &cobra.Command{
 			CursorDown(diff)
 		}
 		// print a final blank line
-		fmt.Println()
+		ioutils.Println()
 	},
 }
 
@@ -83,6 +81,8 @@ func init() {
 	viper.BindPFlag("all", rootCmd.Flags().Lookup("all"))
 	viper.BindPFlag("timing", rootCmd.Flags().Lookup("timing"))
 	viper.BindPFlag("logo", rootCmd.Flags().Lookup("logo"))
+
+	color.InitColors(ioutils.IsTerminal)
 }
 
 func AddCommand(cmd *cobra.Command) {

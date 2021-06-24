@@ -6,7 +6,7 @@ import (
 	"github.com/anthonynsimon/bild/imgio"
 	"github.com/anthonynsimon/bild/transform"
 	"nfetch/internal/color"
-	"os"
+	"nfetch/pkg/ioutils"
 	"text/template"
 )
 
@@ -53,7 +53,7 @@ func PrintLogo(logo string) (int, int) {
 	colorData.C3 = "\x1b[" + color.Colors.C3.Nos(true) + "m"
 	colorData.C4 = "\x1b[" + color.Colors.C4.Nos(true) + "m"
 
-	err = logoTemplate.Execute(os.Stdout, colorData)
+	err = logoTemplate.Execute(ioutils.Stdout, colorData)
 	if err != nil {
 		panic(fmt.Errorf("Unable to render logo: %s \n", err))
 	}
@@ -65,20 +65,20 @@ func PrintLogo(logo string) (int, int) {
 func PrintAsciiImage(path string) {
 	img, err := imgio.Open(path)
 	if err != nil {
-		fmt.Println(err)
+		ioutils.Println(err)
 		return
 	}
 
 	width := img.Bounds().Max.X
 	height := img.Bounds().Max.Y
 
-	fmt.Println(width, height)
+	ioutils.Println(width, height)
 
 	newWidth := 35
 	ratio := float32(height) / float32(width)
 	newHeight := int(ratio*float32(newWidth) + 0.5)
 
-	fmt.Println(newWidth, newHeight, ratio)
+	ioutils.Println(newWidth, newHeight, ratio)
 
 	resized := transform.Resize(img, newWidth, newHeight, transform.Linear)
 
@@ -93,8 +93,8 @@ func PrintAsciiImage(path string) {
 			}
 			foreRGBA := resized.RGBAAt(x, y)
 			foreVT := fmt.Sprintf("\x1b[38;2;%d;%d;%dm", foreRGBA.R, foreRGBA.G, foreRGBA.B)
-			fmt.Print(foreVT + backVT + block + "\x1b[0m")
+			ioutils.Print(foreVT + backVT + block + "\x1b[0m")
 		}
-		fmt.Println()
+		ioutils.Println()
 	}
 }
