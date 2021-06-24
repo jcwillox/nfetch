@@ -29,7 +29,6 @@ builds:
     goarch:
       - 386
       - amd64
-      - arm64
     flags:
       - -trimpath
     ldflags:
@@ -42,6 +41,9 @@ archives:
     format: zip
     files:
       - completions/nfetch.ps1
+    replacements:
+      386: x86
+      amd64: x64
 
   - id: nix
     builds:
@@ -50,13 +52,6 @@ archives:
       - completions/nfetch.zsh
       - completions/nfetch.fish
       - completions/nfetch.sh
-
-#  - replacements:
-#      darwin: Darwin
-#      linux: Linux
-#      windows: Windows
-#      386: i386
-#      amd64: x86_64
 
 nfpms:
   - license: MIT
