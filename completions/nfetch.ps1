@@ -1,21 +1,21 @@
 # powershell completion for nfetch                               -*- shell-script -*-
 
-function __nfetch_debug {
-    if ($env:BASH_COMP_DEBUG_FILE) {
-        "$args" | Out-File -Append -FilePath "$env:BASH_COMP_DEBUG_FILE"
-    }
-}
-
-filter __nfetch_escapeStringWithSpecialChars {
-    $_ -replace '\s|#|@|\$|;|,|''|\{|\}|\(|\)|"|`|\||<|>|&','`$&'
-}
-
 Register-ArgumentCompleter -CommandName 'nfetch' -ScriptBlock {
     param(
             $WordToComplete,
             $CommandAst,
             $CursorPosition
         )
+
+    function __nfetch_debug {
+        if ($env:BASH_COMP_DEBUG_FILE) {
+            "$args" | Out-File -Append -FilePath "$env:BASH_COMP_DEBUG_FILE"
+        }
+    }
+
+    filter __nfetch_escapeStringWithSpecialChars {
+        $_ -replace '\s|#|@|\$|;|,|''|\{|\}|\(|\)|"|`|\||<|>|&','`$&'
+    }
 
     # Get the current command line and convert into a string
     $Command = $CommandAst.CommandElements
