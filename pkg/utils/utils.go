@@ -2,8 +2,10 @@ package utils
 
 import (
 	"bufio"
+	"github.com/mitchellh/go-ps"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -22,6 +24,23 @@ func StripWSLPath() {
 		}
 	}
 	os.Setenv("PATH", strings.Join(newPath, string(os.PathListSeparator)))
+}
+
+func GetProcessByName(name string) (ps.Process, error) {
+	processes, err := ps.Processes()
+	if err != nil {
+		return nil, err
+	}
+	for _, p := range processes {
+		if p.Executable() == name {
+			return p, nil
+		}
+	}
+	return nil, err
+}
+
+func GetFileName(filename string) string {
+	return filename[:len(filename)-len(filepath.Ext(filename))]
 }
 
 func StartCommand(name string, arg ...string) (*bufio.Reader, error) {
@@ -48,4 +67,15 @@ func StringSliceContains(slice []string, s string) bool {
 		}
 	}
 	return false
+}
+
+func StripToEnd(s string, sep string) string {
+	i := strings.Index(s, sep)
+	if i < 0 {
+		return s
+	}
+	if i == 0 {
+		return s[0:0]
+	}
+	return s[0:i]
 }
