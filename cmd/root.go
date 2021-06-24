@@ -57,7 +57,15 @@ var rootCmd = &cobra.Command{
 				showLines = lines.AllLines
 			}
 		}
-		lines.RenderLines(offset, showLines)
+		writtenLines := lines.RenderLines(offset, showLines)
+
+		// move cursor back to the bottom
+		diff := logoHeight - writtenLines
+		if diff > 0 {
+			CursorDown(diff)
+		}
+		// print a final blank line
+		fmt.Println()
 	},
 }
 
