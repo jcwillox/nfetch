@@ -102,11 +102,13 @@ func RenderLines(offset string, lines []interface{}) int {
 			ioutils.Println()
 			writtenLines += 1
 		case LineColorbar:
+			if color.NoColor {
+				break
+			}
 			for _, s := range Colorbar() {
 				ioutils.Print(offset, s, "\n")
 				writtenLines += 1
 			}
-
 		case LineDisk:
 			if diskTitles != nil && diskContent != nil {
 				for i := range diskTitles {

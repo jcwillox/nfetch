@@ -30,21 +30,29 @@ var rootCmd = &cobra.Command{
 	Short:   "A truly cross-platform alternative to neofetch",
 	Version: "0.0.1",
 	Run: func(cmd *cobra.Command, args []string) {
-		HideCursor()
-		DisableLineWrap()
-		defer ShowCursor()
-		defer EnableLineWrap()
+		if !color.NoColor {
+			HideCursor()
+			DisableLineWrap()
+			defer ShowCursor()
+			defer EnableLineWrap()
+		}
 
 		logoString, logoColors := logo.GetLogo()
 
 		if !color.NoColor {
 			color.SetColors(logoColors...)
+		} else {
+			// TODO: allow print logo in no color mode
+			logoString = ""
 		}
 
+		offset := ""
 		logoWidth, logoHeight := logo.PrintLogo(logoString)
 
-		offset := CursorRight(logoWidth + 3)
-		CursorUp(logoHeight)
+		if !color.NoColor && logoString != "" {
+			offset = CursorRight(logoWidth + 3)
+			CursorUp(logoHeight)
+		}
 
 		// render lines
 		var showLines []interface{}
@@ -60,9 +68,11 @@ var rootCmd = &cobra.Command{
 		writtenLines := lines.RenderLines(offset, showLines)
 
 		// move cursor back to the bottom
-		diff := logoHeight - writtenLines
-		if diff > 0 {
-			CursorDown(diff)
+		if !color.NoColor {
+			diff := logoHeight - writtenLines
+			if diff > 0 {
+				CursorDown(diff)
+			}
 		}
 		// print a final blank line
 		ioutils.Println()
