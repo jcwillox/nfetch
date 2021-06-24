@@ -4,6 +4,7 @@ import (
 	"bytes"
 	_ "embed"
 	"fmt"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"nfetch/internal/color"
@@ -11,7 +12,8 @@ import (
 	"nfetch/pkg/ioutils"
 	"nfetch/pkg/lines"
 	"nfetch/pkg/logo"
-	"nfetch/pkg/sysinfo"
+	"os"
+	"path/filepath"
 )
 
 var cfg struct {
@@ -94,23 +96,43 @@ func AddCommand(cmd *cobra.Command) {
 }
 
 func initConfig() {
-	if cfgFile != "" {
-		viper.SetConfigFile(cfgFile)
+	var configDir string
+	var configPath string
+
+	if cfg.File != "" {
+		viper.SetConfigFile(cfg.File)
 	} else {
-		viper.AddConfigPath("$HOME/.config/nfetch")
+		viper.AddConfigPath(".")
+
+		homeDir, err := homedir.Dir()
+		if err == nil {
+			configPath = filepath.Join(homeDir, ".config/nfetch/config.yaml")
+			configDir = filepath.Dir(configPath)
+			viper.AddConfigPath(configDir)
+		}
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			// using built-in default config
 			viper.SetConfigType("yaml")
 			err := viper.ReadConfig(bytes.NewBuffer(defaultConfig))
 			if err != nil {
-				panic(fmt.Errorf("Failed reading default config: %s \n", err))
+				panic(fmt.Errorf("failed reading default config: %s\n", err))
+			}
+
+			// write default config if none exists
+			if _, err := os.Stat(configPath); err != nil {
+				os.MkdirAll(configDir, os.FileMode(0755))
+				fmt.Fprintln(os.Stderr, "writing default config to ~/.config/nfetch/config.yaml")
+				err = os.WriteFile(configPath, defaultConfig, os.FileMode(0644))
+				if err != nil {
+					fmt.Fprintln(os.Stderr, "failed to write default config", err)
+				}
 			}
 		} else {
-			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+			panic(fmt.Errorf("fatal error reading config file: %s\n", err))
 		}
-
 	}
 
 	// handle global flags
