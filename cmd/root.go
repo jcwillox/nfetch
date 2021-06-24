@@ -74,15 +74,19 @@ func Execute() error {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&cfg.File, "config", "", "config file (default ~/.config/nfetch/config.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfg.File, "config", "", "config file (default \"~/.config/nfetch/config.yaml\")")
+	rootCmd.PersistentFlags().String("color", "auto", "when to use colors (always, auto, never)")
 	rootCmd.Flags().BoolVarP(&cfg.All, "all", "a", false, "show all info lines")
 	rootCmd.Flags().Bool("timing", false, "show time taken for each info line")
 	rootCmd.Flags().StringP("logo", "l", "", "override platform specific logo")
+	viper.BindPFlag("color", rootCmd.PersistentFlags().Lookup("color"))
 	viper.BindPFlag("all", rootCmd.Flags().Lookup("all"))
 	viper.BindPFlag("timing", rootCmd.Flags().Lookup("timing"))
 	viper.BindPFlag("logo", rootCmd.Flags().Lookup("logo"))
 
-	color.InitColors(ioutils.IsTerminal)
+	rootCmd.RegisterFlagCompletionFunc("color", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"auto", "always", "never"}, cobra.ShellCompDirectiveNoFileComp
+	})
 }
 
 func AddCommand(cmd *cobra.Command) {
@@ -107,5 +111,15 @@ func initConfig() {
 			panic(fmt.Errorf("Fatal error config file: %s \n", err))
 		}
 
+	}
+
+	// handle global flags
+	switch viper.GetString("color") {
+	case "auto":
+		color.InitColors(ioutils.IsTerminal)
+	case "always":
+		color.InitColors(true)
+	case "never":
+		color.InitColors(false)
 	}
 }
