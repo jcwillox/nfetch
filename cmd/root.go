@@ -78,9 +78,11 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfg.File, "config", "", "config file (default \"~/.config/nfetch/config.yaml\")")
 	rootCmd.PersistentFlags().String("color", "auto", "when to use colors (always, auto, never)")
+	rootCmd.PersistentFlags().BoolP("help", "h", false, "help for nfetch")
 	rootCmd.Flags().BoolVarP(&cfg.All, "all", "a", false, "show all info lines")
 	rootCmd.Flags().Bool("timing", false, "show time taken for each info line")
 	rootCmd.Flags().StringP("logo", "l", "", "override platform specific logo")
+	rootCmd.Flags().BoolP("version", "v", false, "version for nfetch")
 	viper.BindPFlag("color", rootCmd.PersistentFlags().Lookup("color"))
 	viper.BindPFlag("all", rootCmd.Flags().Lookup("all"))
 	viper.BindPFlag("timing", rootCmd.Flags().Lookup("timing"))
