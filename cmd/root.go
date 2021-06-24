@@ -15,6 +15,7 @@ import (
 
 var cfg struct {
 	File string
+	All  bool
 }
 
 //go:embed config.yaml
@@ -46,7 +47,17 @@ var rootCmd = &cobra.Command{
 		CursorUp(logoHeight)
 
 		// render lines
-		lines.RenderLines(offset, viper.Get("lines").([]interface{}))
+		var showLines []interface{}
+		if cfg.All {
+			showLines = lines.AllLines
+		} else {
+			var ok bool
+			showLines, ok = viper.Get("lines").([]interface{})
+			if !ok {
+				showLines = lines.AllLines
+			}
+		}
+		lines.RenderLines(offset, showLines)
 	},
 }
 
@@ -58,8 +69,10 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfg.File, "config", "", "config file (default ~/.config/nfetch/config.yaml)")
+	rootCmd.Flags().BoolVarP(&cfg.All, "all", "a", false, "show all info lines")
 	rootCmd.Flags().Bool("timing", false, "show time taken for each info line")
-	rootCmd.Flags().StringP("logo", "l", "", "show time taken for each info line")
+	rootCmd.Flags().StringP("logo", "l", "", "override platform specific logo")
+	viper.BindPFlag("all", rootCmd.Flags().Lookup("all"))
 	viper.BindPFlag("timing", rootCmd.Flags().Lookup("timing"))
 	viper.BindPFlag("logo", rootCmd.Flags().Lookup("logo"))
 }
