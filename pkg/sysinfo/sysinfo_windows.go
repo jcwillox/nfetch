@@ -74,16 +74,19 @@ func Distro() string {
 	return strings.TrimPrefix(platform, "Microsoft ")
 }
 
-func Motherboard() (Win32Baseboard, error) {
+func Motherboard() (MotherboardInfo, error) {
 	var win32BaseboardDescriptions []Win32Baseboard
 	conn := WmiSharedConnection()
 	if err := conn.Query(wqlBaseboard, &win32BaseboardDescriptions); err != nil {
-		return Win32Baseboard{}, err
+		return MotherboardInfo{}, err
 	}
 	if len(win32BaseboardDescriptions) > 0 {
-		return win32BaseboardDescriptions[0], nil
+		return MotherboardInfo{
+			Manufacturer: *win32BaseboardDescriptions[0].Manufacturer,
+			Product:      *win32BaseboardDescriptions[0].Product,
+		}, nil
 	}
-	return Win32Baseboard{}, nil
+	return MotherboardInfo{}, nil
 }
 
 func Model() (ModelInfo, error) {

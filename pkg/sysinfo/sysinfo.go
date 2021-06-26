@@ -26,6 +26,11 @@ type ModelInfo struct {
 	Model        string
 }
 
+type MotherboardInfo struct {
+	Manufacturer string
+	Product      string
+}
+
 var HTTPClient = http.Client{
 	Timeout: time.Second * 3,
 }

@@ -75,6 +75,10 @@ func Distro() string {
 	return runtime.GOOS
 }
 
+func Motherboard() (MotherboardInfo, error) {
+	return MotherboardInfo{}, nil
+}
+
 func Model() (ModelInfo, error) {
 	model, err := model()
 	if err != nil {

@@ -7,14 +7,6 @@ import (
 	"nfetch/pkg/sysinfo"
 )
 
-func Motherboard(config LineConfig) (string, error) {
-	info, err := sysinfo.Motherboard()
-	if err != nil {
-		return "", err
-	}
-	return *info.Manufacturer + " " + *info.Product, nil
-}
-
 func Theme(config LineConfig) (string, error) {
 	sysTheme, appTheme, err := sysinfo.Theme()
 	if err != nil {

@@ -173,6 +173,14 @@ func Kernel(config LineConfig) (string, error) {
 	return kernelVersion, nil
 }
 
+func Motherboard(config LineConfig) (string, error) {
+	info, err := sysinfo.Motherboard()
+	if err != nil || info == (sysinfo.MotherboardInfo{}) {
+		return "", err
+	}
+	return info.Manufacturer + " " + info.Product, nil
+}
+
 func Uptime(config LineConfig) (string, error) {
 	uptime, err := host.Uptime()
 	if err != nil {
