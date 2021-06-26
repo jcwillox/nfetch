@@ -2,8 +2,6 @@ package logo
 
 import (
 	_ "embed"
-	"github.com/spf13/viper"
-	"nfetch/pkg/sysinfo"
 	"strings"
 )
 
@@ -16,18 +14,14 @@ var kali string
 //go:embed logos/alpine.txt
 var alpine string
 
-func GetLogo() (string, []int) {
-	logo := viper.GetString("logo")
-	if logo == "" {
-		logo = sysinfo.Distro()
-	}
+func getLogo(logo string) (string, []int) {
 	switch {
-	case strings.HasPrefix(logo, "Ubuntu"):
+	case strings.HasPrefix(logo, "ubuntu"):
 		return ubuntu, []int{1, 7, 3}
-	case strings.HasPrefix(logo, "Kali"):
+	case strings.HasPrefix(logo, "kali"):
 		return kali, []int{4, 8}
-	case strings.HasPrefix(logo, "Alpine"):
+	case strings.HasPrefix(logo, "alpine"):
 		return alpine, []int{4, 5, 7, 6}
 	}
-	return "", nil
+	return "", []int{4}
 }

@@ -5,10 +5,23 @@ import (
 	"fmt"
 	"github.com/anthonynsimon/bild/imgio"
 	"github.com/anthonynsimon/bild/transform"
+	"github.com/spf13/viper"
 	"nfetch/internal/color"
 	"nfetch/pkg/ioutils"
+	"nfetch/pkg/sysinfo"
+	"strings"
 	"text/template"
 )
+
+func GetLogo() (string, []int) {
+	logo := viper.GetString("logo")
+	if logo == "" {
+		logo = sysinfo.Distro()
+	}
+	// case-insensitive
+	logo = strings.ToLower(logo)
+	return getLogo(logo)
+}
 
 func PrintLogo(logo string) (int, int) {
 	logoTemplate, err := template.New("logo").Parse(logo)
