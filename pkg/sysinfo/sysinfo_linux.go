@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 )
 
@@ -65,7 +66,11 @@ func Distro() string {
 	if name != "" {
 		return name
 	}
-	return ""
+	out, err = exec.Command("uname", "-o").Output()
+	if err == nil {
+		return strings.TrimRight(string(out), "\n")
+	}
+	return runtime.GOOS
 }
 
 func GPU() (string, error) {
