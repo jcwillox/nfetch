@@ -15,14 +15,6 @@ func Motherboard(config LineConfig) (string, error) {
 	return *info.Manufacturer + " " + *info.Product, nil
 }
 
-func GPU(config LineConfig) (string, error) {
-	gpu, err := sysinfo.GPU()
-	if err != nil {
-		return "", err
-	}
-	return *gpu.Name, nil
-}
-
 func Theme(config LineConfig) (string, error) {
 	sysTheme, appTheme, err := sysinfo.Theme()
 	if err != nil {

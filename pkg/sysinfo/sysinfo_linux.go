@@ -68,6 +68,10 @@ func Distro() string {
 	return ""
 }
 
+func GPU() (string, error) {
+	return "(not implemented)", nil
+}
+
 func Swap() (*mem.SwapMemoryStat, error) {
 	swap, err := mem.SwapMemory()
 	if err != nil {

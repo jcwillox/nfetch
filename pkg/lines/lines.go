@@ -231,6 +231,10 @@ func CPU(config LineConfig) (string, error) {
 	return name, err
 }
 
+func GPU(config LineConfig) (string, error) {
+	return sysinfo.GPU()
+}
+
 func Memory(config LineConfig) (string, error) {
 	mem, err := sysinfo.Memory()
 	if err != nil {

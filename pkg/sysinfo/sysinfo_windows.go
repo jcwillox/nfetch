@@ -118,16 +118,16 @@ func Theme() (uint64, uint64, error) {
 	return sysTheme, appTheme, nil
 }
 
-func GPU() (Win32GPU, error) {
+func GPU() (string, error) {
 	var win32GPUDescriptions []Win32GPU
 	conn := WmiSharedConnection()
 	if err := conn.Query(wqlGPU, &win32GPUDescriptions); err != nil {
-		return Win32GPU{}, err
+		return "", err
 	}
 	if len(win32GPUDescriptions) > 0 {
-		return win32GPUDescriptions[0], nil
+		return *win32GPUDescriptions[0].Name, nil
 	}
-	return Win32GPU{}, nil
+	return "", nil
 }
 
 func Swap() (mem.SwapMemoryStat, error) {
