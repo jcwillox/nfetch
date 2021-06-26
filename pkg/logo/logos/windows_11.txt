@@ -1,4 +1,3 @@
-
 {{.C1}}lllllllllllllll   {{.C2}}lllllllllllllll
 {{.C1}}lllllllllllllll   {{.C2}}lllllllllllllll
 {{.C1}}lllllllllllllll   {{.C2}}lllllllllllllll
