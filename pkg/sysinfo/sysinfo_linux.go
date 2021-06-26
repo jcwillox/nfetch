@@ -4,7 +4,9 @@ package sysinfo
 
 import (
 	"bufio"
+	"bytes"
 	"context"
+	"fmt"
 	"github.com/shirou/gopsutil/mem"
 	"net"
 	"os"
@@ -71,6 +73,42 @@ func Distro() string {
 		return strings.TrimRight(string(out), "\n")
 	}
 	return runtime.GOOS
+}
+
+func Model() (ModelInfo, error) {
+	model, err := model()
+	if err != nil {
+		return ModelInfo{}, err
+	}
+	model = strings.TrimSuffix(model, "\n")
+	if strings.HasPrefix(model, "Standard PC") {
+		model = fmt.Sprintf("KVM/QEMU (%s)", model)
+	} else if strings.HasPrefix(model, "OpenBSD") {
+		model = fmt.Sprintf("vmm (%s)", model)
+	}
+	return ModelInfo{Model: model}, nil
+}
+
+func model() (string, error) {
+	model, err := os.ReadFile("/sys/devices/virtual/dmi/id/product_name")
+	if err == nil {
+		model = bytes.TrimSuffix(model, []byte("\n"))
+		productVersion, err := os.ReadFile("/sys/devices/virtual/dmi/id/product_version")
+		if err == nil {
+			model = append(model, ' ')
+			model = append(model, productVersion...)
+		}
+		return string(model), nil
+	}
+	model, err = os.ReadFile("/sys/firmware/devicetree/base/model")
+	if err == nil {
+		return string(model), nil
+	}
+	model, err = os.ReadFile("/tmp/sysinfo/model")
+	if err == nil {
+		return string(model), nil
+	}
+	return "(unknown)", nil
 }
 
 func GPU() (string, error) {

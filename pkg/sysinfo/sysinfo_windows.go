@@ -86,16 +86,19 @@ func Motherboard() (Win32Baseboard, error) {
 	return Win32Baseboard{}, nil
 }
 
-func Model() (Win32Model, error) {
+func Model() (ModelInfo, error) {
 	var win32ModelDescriptions []Win32Model
 	conn := WmiSharedConnection()
 	if err := conn.Query(wqlModel, &win32ModelDescriptions); err != nil {
-		return Win32Model{}, err
+		return ModelInfo{}, err
 	}
 	if len(win32ModelDescriptions) > 0 {
-		return win32ModelDescriptions[0], nil
+		return ModelInfo{
+			Manufacturer: *win32ModelDescriptions[0].Manufacturer,
+			Model:        *win32ModelDescriptions[0].Model,
+		}, nil
 	}
-	return Win32Model{}, nil
+	return ModelInfo{}, nil
 }
 
 func Theme() (uint64, uint64, error) {

@@ -34,11 +34,3 @@ func Theme(config LineConfig) (string, error) {
 	}
 	return fmt.Sprintf("System - %s, Apps - %s", sys, app), err
 }
-
-func Model(config LineConfig) (string, error) {
-	model, err := sysinfo.Model()
-	if err != nil {
-		return "", err
-	}
-	return *model.Manufacturer + " " + *model.Model, nil
-}

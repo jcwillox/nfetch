@@ -21,6 +21,11 @@ import (
 	"time"
 )
 
+type ModelInfo struct {
+	Manufacturer string
+	Model        string
+}
+
 var HTTPClient = http.Client{
 	Timeout: time.Second * 3,
 }

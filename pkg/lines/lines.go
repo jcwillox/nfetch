@@ -147,6 +147,21 @@ func OS(config LineConfig) (string, error) {
 	return fmt.Sprintf("%s [%s]", name, kernelArch), nil
 }
 
+func Model(config LineConfig) (string, error) {
+	model, err := sysinfo.Model()
+	if err != nil {
+		return "", err
+	}
+	result := model.Manufacturer
+	if model.Model != "" {
+		if model.Manufacturer != "" {
+			result += " "
+		}
+		result += model.Model
+	}
+	return result, nil
+}
+
 func Kernel(config LineConfig) (string, error) {
 	kernelVersion, err := host.KernelVersion()
 	if err != nil {

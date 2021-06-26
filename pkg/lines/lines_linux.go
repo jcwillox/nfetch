@@ -9,7 +9,3 @@ func Motherboard(config LineConfig) (string, error) {
 func Theme(config LineConfig) (string, error) {
 	return "(not implemented)", nil
 }
-
-func Model(config LineConfig) (string, error) {
-	return "(not implemented)", nil
-}
