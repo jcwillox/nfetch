@@ -5,11 +5,13 @@ import (
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/spf13/viper"
 	"nfetch/internal/color"
+	. "nfetch/pkg"
 	"nfetch/pkg/ioutils"
+	"strings"
 	"time"
 )
 
-func RenderLines(offset string, lines []interface{}) int {
+func RenderLines(offset int, lines []interface{}, logo []string) int {
 	lineStrSlice := make([]string, 0, len(lines))
 
 	type Result struct {
@@ -86,35 +88,53 @@ func RenderLines(offset string, lines []interface{}) int {
 		}()
 	}
 
-	// receive results
 	writtenLines := 0
+	var printLine func(a ...interface{})
+
+	if logo == nil {
+		// -1 to account for difference between counting columns and characters
+		prefix := CursorRight(offset + 1)
+		printLine = func(a ...interface{}) {
+			ioutils.Print(prefix)
+			ioutils.Print(a...)
+			ioutils.Println()
+			writtenLines += 1
+		}
+	} else {
+		printLine = func(a ...interface{}) {
+			if len(logo) > writtenLines {
+				ioutils.Print(logo[writtenLines], strings.Repeat(" ", offset-len(logo[writtenLines])))
+			} else {
+				ioutils.Print(strings.Repeat(" ", offset))
+			}
+			ioutils.Print(a...)
+			ioutils.Println()
+			writtenLines += 1
+		}
+	}
+
+	// receive results
 	for i := 0; i < len(lineStrSlice); i++ {
 		line := lineStrSlice[i]
 
 		switch line {
 		case LineTitle:
-			ioutils.Print(offset, Title(), "\n")
-			writtenLines += 1
+			printLine(Title())
 		case LineDashes:
-			ioutils.Print(offset, Dashes(), "\n")
-			writtenLines += 1
+			printLine(Dashes())
 		case LineBlank:
-			ioutils.Println()
-			writtenLines += 1
+			printLine()
 		case LineColorbar:
 			if color.NoColor {
 				break
 			}
 			for _, s := range Colorbar() {
-				ioutils.Print(offset, s, "\n")
-				writtenLines += 1
+				printLine(s)
 			}
 		case LineDisk:
 			if diskTitles != nil && diskContent != nil {
 				for i := range diskTitles {
-					ioutils.Print(offset, aurora.Colorize(diskTitles[i], color.Colors.C1), ": ")
-					ioutils.Println(diskContent[i])
-					writtenLines += 1
+					printLine(aurora.Colorize(diskTitles[i], color.Colors.C1), ": ", diskContent[i])
 				}
 				break
 			}
@@ -123,9 +143,7 @@ func RenderLines(offset string, lines []interface{}) int {
 		default:
 			// try get from map
 			if res, present := lineResults[line]; present {
-				ioutils.Print(offset, aurora.Colorize(res.Title, color.Colors.C1), ": ")
-				ioutils.Println(res.Content)
-				writtenLines += 1
+				printLine(aurora.Colorize(res.Title, color.Colors.C1), ": ", res.Content)
 				break
 			}
 
@@ -133,9 +151,7 @@ func RenderLines(offset string, lines []interface{}) int {
 			result := <-results
 			// check if current result
 			if result.Line == line {
-				ioutils.Print(offset, aurora.Colorize(result.Title, color.Colors.C1), ": ")
-				ioutils.Println(result.Content)
-				writtenLines += 1
+				printLine(aurora.Colorize(result.Title, color.Colors.C1), ": ", result.Content)
 			} else {
 				i--
 			}
@@ -147,8 +163,13 @@ func RenderLines(offset string, lines []interface{}) int {
 	}
 
 	if showTiming {
-		ioutils.Print(offset, "total time: ", time.Since(start), "\n")
+		printLine("total time: ", time.Since(start))
 		writtenLines++
+	}
+
+	// print remaining lines when in no-color mode
+	for i := writtenLines; i < len(logo); i++ {
+		printLine()
 	}
 
 	return writtenLines

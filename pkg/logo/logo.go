@@ -23,8 +23,8 @@ func GetLogo() (string, []int) {
 	return getLogo(logo)
 }
 
-func PrintLogo(logo string) (int, int) {
-	logoTemplate, err := template.New("logo").Parse(logo)
+func RenderLogo(rawLogoTemplate string) (logo []string, logoWidth int, logoHeight int) {
+	logoTemplate, err := template.New("logo").Parse(rawLogoTemplate)
 	if err != nil {
 		panic(fmt.Errorf("Unable to parse logo template: %s \n", err))
 	}
@@ -43,8 +43,8 @@ func PrintLogo(logo string) (int, int) {
 		panic(fmt.Errorf("Unable to render plain logo: %s \n", err))
 	}
 
-	logoHeight := 0
-	logoWidth := 0
+	// TODO: count newlines to get size?
+	lines := make([]string, 0, 10)
 
 	for {
 		line, err := buff.ReadString('\n')
@@ -52,13 +52,22 @@ func PrintLogo(logo string) (int, int) {
 			break
 		}
 		logoHeight++
+		line = strings.TrimRight(line, "\r\n")
 		length := len(line)
 		if length > logoWidth {
 			logoWidth = length
 		}
+
+		if color.NoColor {
+			lines = append(lines, line)
+		}
 	}
 
-	// TODO: only parse template once when no colors
+	if color.NoColor {
+		return lines, logoWidth, logoHeight
+	}
+
+	buff.Reset()
 
 	// parse with colours
 	colorData.C1 = "\x1b[" + color.Colors.C1.Nos(true) + "m"
@@ -66,13 +75,20 @@ func PrintLogo(logo string) (int, int) {
 	colorData.C3 = "\x1b[" + color.Colors.C3.Nos(true) + "m"
 	colorData.C4 = "\x1b[" + color.Colors.C4.Nos(true) + "m"
 
-	err = logoTemplate.Execute(ioutils.Stdout, colorData)
+	err = logoTemplate.Execute(&buff, colorData)
 	if err != nil {
 		panic(fmt.Errorf("Unable to render logo: %s \n", err))
 	}
 
-	// remove newline from width count
-	return logoWidth - 1, logoHeight
+	for {
+		line, err := buff.ReadString('\n')
+		if err != nil {
+			break
+		}
+		lines = append(lines, line)
+	}
+
+	return lines, logoWidth, logoHeight
 }
 
 func PrintAsciiImage(path string) {

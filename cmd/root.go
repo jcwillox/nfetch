@@ -41,16 +41,20 @@ var rootCmd = &cobra.Command{
 
 		if !color.NoColor {
 			color.SetColors(logoColors...)
-		} else {
-			// TODO: allow print logo in no color mode
-			logoString = ""
 		}
 
-		offset := ""
-		logoWidth, logoHeight := logo.PrintLogo(logoString)
+		// TODO: if logoString empty or no image don't render logo
+
+		renderedLogo, logoWidth, logoHeight := logo.RenderLogo(logoString)
+
+		if logoWidth > 0 {
+			logoWidth += 3
+		}
 
 		if !color.NoColor && logoString != "" {
-			offset = CursorRight(logoWidth + 3)
+			for _, line := range renderedLogo {
+				ioutils.Print(line)
+			}
 			CursorUp(logoHeight)
 		}
 
@@ -65,15 +69,19 @@ var rootCmd = &cobra.Command{
 				showLines = lines.AllLines
 			}
 		}
-		writtenLines := lines.RenderLines(offset, showLines)
 
-		// move cursor back to the bottom
 		if !color.NoColor {
+			writtenLines := lines.RenderLines(logoWidth, showLines, nil)
+
+			// move cursor back to the bottom
 			diff := logoHeight - writtenLines
 			if diff > 0 {
 				CursorDown(diff)
 			}
+		} else {
+			lines.RenderLines(logoWidth, showLines, renderedLogo)
 		}
+
 		// print a final blank line
 		ioutils.Println()
 	},
