@@ -79,3 +79,12 @@ func StripToEnd(s string, sep string) string {
 	}
 	return s[0:i]
 }
+
+func HasPrefixMulti(s string, prefixes ...string) bool {
+	for _, prefix := range prefixes {
+		if strings.HasPrefix(s, prefix) {
+			return true
+		}
+	}
+	return false
+}

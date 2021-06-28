@@ -49,18 +49,18 @@ var funcMap = map[string]func(config LineConfig) (string, error){
 	LinePkgs:        Pkgs,
 	//LineShell:
 	LineResolution: Resolution,
-	//LineTerminal:
-	LineTheme:    Theme,
-	LineCPU:      CPU,
-	LineGPU:      GPU,
-	LineUsage:    Usage,
-	LineMemory:   Memory,
-	LineSwap:     Swap,
-	LineBattery:  Battery,
-	LineLocale:   Locale,
-	LineWeather:  Weather,
-	LineLocalIP:  LocalIP,
-	LinePublicIP: PublicIP,
+	LineTerminal:   Terminal,
+	LineTheme:      Theme,
+	LineCPU:        CPU,
+	LineGPU:        GPU,
+	LineUsage:      Usage,
+	LineMemory:     Memory,
+	LineSwap:       Swap,
+	LineBattery:    Battery,
+	LineLocale:     Locale,
+	LineWeather:    Weather,
+	LineLocalIP:    LocalIP,
+	LinePublicIP:   PublicIP,
 }
 
 var defaultTitleMap = map[string]string{
@@ -232,6 +232,10 @@ func Resolution(config LineConfig) (string, error) {
 		parts[i] = fmt.Sprintf("%dx%d", bounds.Dx(), bounds.Dy())
 	}
 	return strings.Join(parts, ", "), nil
+}
+
+func Terminal(config LineConfig) (string, error) {
+	return sysinfo.Terminal()
 }
 
 func Usage(config LineConfig) (string, error) {
