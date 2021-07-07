@@ -47,20 +47,20 @@ var funcMap = map[string]func(config LineConfig) (string, error){
 	LineMotherboard: Motherboard,
 	LineUptime:      Uptime,
 	LinePkgs:        Pkgs,
-	//LineShell:
-	LineResolution: Resolution,
-	LineTerminal:   Terminal,
-	LineTheme:      Theme,
-	LineCPU:        CPU,
-	LineGPU:        GPU,
-	LineUsage:      Usage,
-	LineMemory:     Memory,
-	LineSwap:       Swap,
-	LineBattery:    Battery,
-	LineLocale:     Locale,
-	LineWeather:    Weather,
-	LineLocalIP:    LocalIP,
-	LinePublicIP:   PublicIP,
+	LineShell:       Shell,
+	LineResolution:  Resolution,
+	LineTerminal:    Terminal,
+	LineTheme:       Theme,
+	LineCPU:         CPU,
+	LineGPU:         GPU,
+	LineUsage:       Usage,
+	LineMemory:      Memory,
+	LineSwap:        Swap,
+	LineBattery:     Battery,
+	LineLocale:      Locale,
+	LineWeather:     Weather,
+	LineLocalIP:     LocalIP,
+	LinePublicIP:    PublicIP,
 }
 
 var defaultTitleMap = map[string]string{
@@ -220,6 +220,14 @@ func Pkgs(config LineConfig) (string, error) {
 		result = append(result, fmt.Sprintf("%d (%s)", amt, pkg))
 	}
 	return strings.Join(result, ", "), nil
+}
+
+func Shell(config LineConfig) (string, error) {
+	info := sysinfo.Shell()
+	if info.Version == "" {
+		return info.Name, nil
+	}
+	return fmt.Sprintf("%s %s", info.Name, info.Version), nil
 }
 
 func Resolution(config LineConfig) (string, error) {
