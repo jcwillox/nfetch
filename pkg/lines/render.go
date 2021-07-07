@@ -20,13 +20,17 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 		Content string
 	}
 
+	type DiskResult struct {
+		Titles  []string
+		Content []string
+	}
+
 	lineResults := make(map[string]Result)
+
 	results := make(chan Result)
+	diskResult := make(chan DiskResult)
+
 	showTiming := viper.GetBool("timing")
-
-	var diskTitles []string
-	var diskContent []string
-
 	start := time.Now()
 
 	// start goroutines to render lines
@@ -39,11 +43,14 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 			continue
 		case LineDisk:
 			go func() {
-				var err error
-				diskTitles, diskContent, err = Disk(config)
+				titles, content, err := Disk(config)
 				if err != nil {
-					diskTitles = []string{"Disk"}
-					diskContent = []string{color.ErrorMsg}
+					titles = []string{"Disk"}
+					content = []string{color.ErrorMsg}
+				}
+				diskResult <- DiskResult{
+					Titles:  titles,
+					Content: content,
 				}
 			}()
 			continue
@@ -132,14 +139,10 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 				printLine(s)
 			}
 		case LineDisk:
-			if diskTitles != nil && diskContent != nil {
-				for i := range diskTitles {
-					printLine(aurora.Colorize(diskTitles[i], color.Colors.C1), ": ", diskContent[i])
-				}
-				break
+			diskResult := <-diskResult
+			for i, title := range diskResult.Titles {
+				printLine(aurora.Colorize(title, color.Colors.C1), ": ", diskResult.Content[i])
 			}
-			// we haven't go disks yet so process a result
-			fallthrough
 		default:
 			// try get from map
 			if res, present := lineResults[line]; present {
