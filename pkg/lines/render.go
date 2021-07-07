@@ -84,7 +84,7 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 			}
 
 			if showTiming {
-				content = fmt.Sprint(content, aurora.Yellow(" [took "), aurora.Red(time.Since(start)).String(), aurora.Yellow("]").String())
+				content = fmt.Sprint(content, color.AU.Yellow(" [took "), color.AU.Red(time.Since(start)).String(), color.AU.Yellow("]").String())
 			}
 
 			results <- Result{
