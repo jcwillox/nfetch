@@ -5,6 +5,9 @@ import (
 	"strings"
 )
 
+//go:embed logos/debian.txt
+var debian string
+
 //go:embed logos/ubuntu.txt
 var ubuntu string
 
@@ -14,8 +17,13 @@ var kali string
 //go:embed logos/alpine.txt
 var alpine string
 
+//go:embed logos/linux.txt
+var linux string
+
 func getLogo(logo string) (string, []int) {
 	switch {
+	case strings.HasPrefix(logo, "debian"):
+		return debian, []int{1, 7, 3}
 	case strings.HasPrefix(logo, "ubuntu"):
 		return ubuntu, []int{1, 7, 3}
 	case strings.HasPrefix(logo, "kali"):
@@ -23,5 +31,5 @@ func getLogo(logo string) (string, []int) {
 	case strings.HasPrefix(logo, "alpine"):
 		return alpine, []int{4, 5, 7, 6}
 	}
-	return "", []int{4}
+	return linux, []int{15, 8, 3}
 }
