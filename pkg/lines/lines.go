@@ -40,7 +40,7 @@ const (
 	LinePublicIP    = "public_ip"
 )
 
-var funcMap = map[string]func(config LineConfig) (string, error){
+var FuncMap = map[string]func(config LineConfig) (string, error){
 	LineOS:          OS,
 	LineHost:        Model,
 	LineKernel:      Kernel,
@@ -63,7 +63,7 @@ var funcMap = map[string]func(config LineConfig) (string, error){
 	LinePublicIP:    PublicIP,
 }
 
-var defaultTitleMap = map[string]string{
+var DefaultTitleMap = map[string]string{
 	LineOS:          "OS",
 	LineHost:        "Host",
 	LineKernel:      "Kernel",
@@ -86,7 +86,7 @@ var defaultTitleMap = map[string]string{
 	LinePublicIP:    "Public IP",
 }
 
-var allLines = []interface{}{
+var AllLines = []interface{}{
 	LineTitle,
 	LineDashes,
 	LineOS,
