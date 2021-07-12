@@ -7,16 +7,50 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
 	"net"
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
 )
 
-func CPUName() (string, error) {
-	return "unknown", nil
+func cpuInfo() (CPUInfo, error) {
+	info, err := cpu.Info()
+	if err != nil || len(info) == 0 {
+		return CPUInfo{}, err
+	}
+
+	model := info[0].ModelName
+	if model == "" {
+		model = info[0].VendorID
+	}
+
+	var threads, cores int32 = 0, 0
+	for _, stat := range info {
+		threads += stat.Cores
+		coreId, _ := strconv.Atoi(stat.CoreID)
+		if int32(coreId) > cores {
+			cores = int32(coreId)
+		}
+	}
+
+	if cores == 0 {
+		// something when wrong so fallback to thread count
+		cores = threads
+	} else {
+		// coreId is 0-based so add 1 for count
+		cores += 1
+	}
+
+	return CPUInfo{
+		Model:   model,
+		Cores:   cores,
+		Threads: threads,
+		Mhz:     info[0].Mhz,
+	}, nil
 }
 
 func getPrettyName(path string) string {

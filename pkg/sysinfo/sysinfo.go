@@ -15,6 +15,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"nfetch/pkg/utils"
 	"os"
 	"path/filepath"
 	"strings"
@@ -22,13 +23,20 @@ import (
 )
 
 type ModelInfo struct {
-	Manufacturer string
-	Model        string
+	Manufacturer string `json:"manufacturer"`
+	Model        string `json:"model"`
 }
 
 type MotherboardInfo struct {
-	Manufacturer string
-	Product      string
+	Manufacturer string `json:"manufacturer"`
+	Product      string `json:"product"`
+}
+
+type CPUInfo struct {
+	Model   string  `json:"model"`
+	Cores   int32   `json:"cores"`
+	Threads int32   `json:"threads"`
+	Mhz     float64 `json:"mhz"`
 }
 
 var HTTPClient = http.Client{
@@ -72,6 +80,26 @@ func Resolution() []image.Rectangle {
 		displays[i] = screenshot.GetDisplayBounds(i)
 	}
 	return displays
+}
+
+func CPU() (CPUInfo, error) {
+	info, err := cpuInfo()
+	if err != nil {
+		return CPUInfo{}, err
+	}
+
+	info.Model = strings.Replace(info.Model, "(TM)", "", -1)
+	info.Model = strings.Replace(info.Model, "(tm)", "", -1)
+	info.Model = strings.Replace(info.Model, "(R)", "", -1)
+	info.Model = strings.Replace(info.Model, "(r)", "", -1)
+	info.Model = strings.Replace(info.Model, "CPU", "", -1)
+	info.Model = strings.Replace(info.Model, "Core ", "", -1)
+	info.Model = strings.Replace(info.Model, "Processor", "", -1)
+	info.Model = strings.Replace(info.Model, "processor", "", -1)
+	info.Model = utils.StripToEnd(info.Model, "@")
+	info.Model = strings.TrimSpace(info.Model)
+
+	return info, nil
 }
 
 func Usage() (float64, error) {

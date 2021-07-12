@@ -259,11 +259,24 @@ func Usage(config LineConfig) (string, error) {
 }
 
 func CPU(config LineConfig) (string, error) {
-	name, err := sysinfo.CPUName()
+	info, err := sysinfo.CPU()
 	if err != nil {
 		return "", err
 	}
-	return name, err
+	if info.Cores > 0 {
+		if info.Threads > 0 && info.Cores != info.Threads {
+			info.Model += fmt.Sprintf(" (%d/%d)", info.Cores, info.Threads)
+		} else {
+			info.Model += fmt.Sprintf(" (%d)", info.Cores)
+		}
+	}
+	if info.Mhz == 0 {
+		return info.Model, nil
+	} else if info.Mhz >= 1000 {
+		return fmt.Sprintf("%s @ %.2fGHz", info.Model, info.Mhz/1000), nil
+	} else {
+		return fmt.Sprintf("%s @ %.1fMHz", info.Model, info.Mhz), nil
+	}
 }
 
 func GPU(config LineConfig) (string, error) {
@@ -287,7 +300,6 @@ func Disk(config LineConfig) (title []string, content []string, err error) {
 	if err != nil {
 		return
 	}
-
 	for _, stat := range disks {
 		val, unit := BytesToHuman(float64(stat.Used), 1, "TiB")
 		max, unitMax := BytesToHuman(float64(stat.Total), 1, "TiB")

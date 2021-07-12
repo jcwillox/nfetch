@@ -3,6 +3,7 @@
 package sysinfo
 
 import (
+	"fmt"
 	"github.com/StackExchange/wmi"
 	"github.com/miekg/dns"
 	"github.com/shirou/gopsutil/host"
@@ -15,6 +16,7 @@ import (
 
 const wqlBaseboard = "SELECT Manufacturer, Product FROM Win32_BaseBoard"
 const wqlModel = "SELECT Manufacturer, Model FROM Win32_ComputerSystem"
+const wqlCPU = "SELECT Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed FROM Win32_Processor"
 const wqlGPU = "SELECT Name FROM Win32_VideoController"
 const wqlPageFile = "SELECT CurrentUsage, AllocatedBaseSize FROM Win32_PageFileUsage"
 
@@ -26,6 +28,13 @@ type Win32Baseboard struct {
 type Win32Model struct {
 	Manufacturer *string
 	Model        *string
+}
+
+type Win32CPU struct {
+	Name                      *string
+	NumberOfCores             *uint64
+	NumberOfLogicalProcessors *uint64
+	MaxClockSpeed             *uint64
 }
 
 type Win32GPU struct {
@@ -60,10 +69,6 @@ func WmiSharedConnection() *wmi.SWbemServicesConnection {
 	}
 	connection = c
 	return c
-}
-
-func CPUName() (string, error) {
-	return ReadRegistryString(registry.LOCAL_MACHINE, `HARDWARE\DESCRIPTION\System\CentralProcessor\0`, "ProcessorNameString")
 }
 
 func Distro() string {
@@ -122,6 +127,23 @@ func Theme() (uint64, uint64, error) {
 	}
 
 	return sysTheme, appTheme, nil
+}
+
+func cpuInfo() (CPUInfo, error) {
+	var win32CPUDescriptions []Win32CPU
+	conn := WmiSharedConnection()
+	if err := conn.Query(wqlCPU, &win32CPUDescriptions); err != nil {
+		return CPUInfo{}, err
+	}
+	if len(win32CPUDescriptions) > 0 {
+		return CPUInfo{
+			Model:   *win32CPUDescriptions[0].Name,
+			Cores:   int32(*win32CPUDescriptions[0].NumberOfCores),
+			Threads: int32(*win32CPUDescriptions[0].NumberOfLogicalProcessors),
+			Mhz:     float64(*win32CPUDescriptions[0].MaxClockSpeed),
+		}, nil
+	}
+	return CPUInfo{}, nil
 }
 
 func GPU() (string, error) {
