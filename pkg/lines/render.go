@@ -108,6 +108,7 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 			writtenLines += 1
 		}
 	} else {
+		// write logo progressively
 		printLine = func(a ...interface{}) {
 			if len(logo) > writtenLines {
 				ioutils.Print(logo[writtenLines], strings.Repeat(" ", offset-len(logo[writtenLines])))

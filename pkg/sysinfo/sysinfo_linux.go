@@ -10,6 +10,7 @@ import (
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
 	"net"
+	"nfetch/pkg/utils"
 	"os"
 	"os/exec"
 	"runtime"
@@ -77,16 +78,37 @@ func getPrettyName(path string) string {
 	return ""
 }
 
-func Distro() string {
-	out, err := exec.Command("pveversion").Output()
-	if err == nil {
-		return "Proxmox VE " + strings.SplitN(string(out), "/", 3)[1]
+func getProxmoxVersion() string {
+	if _, err := exec.LookPath("pveversion"); err != nil {
+		return ""
 	}
-	name := getPrettyName("/etc/lsb-release")
+
+	reader, err := utils.StartCommand("dpkg", "-s", "pve-manager")
+	if err == nil {
+		for {
+			line, err := reader.ReadString('\n')
+			if err != nil {
+				break
+			}
+			if strings.HasPrefix(line, "Version:") {
+				return "Proxmox VE " + strings.TrimRight(strings.TrimPrefix(line, "Version: "), "\n")
+			}
+		}
+	}
+
+	return "Proxmox VE"
+}
+
+func Distro() string {
+	name := getProxmoxVersion()
 	if name != "" {
 		return name
 	}
-	out, err = exec.Command("lsb_release", "-sd").Output()
+	name = getPrettyName("/etc/lsb-release")
+	if name != "" {
+		return name
+	}
+	out, err := exec.Command("lsb_release", "-sd").Output()
 	if err == nil {
 		return strings.TrimRight(string(out), "\n")
 	}
