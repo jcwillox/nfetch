@@ -2,6 +2,7 @@ package logo
 
 import (
 	_ "embed"
+	"github.com/shirou/gopsutil/host"
 	"strings"
 )
 
@@ -21,6 +22,21 @@ var alpine string
 var linux string
 
 func getLogo(logo string) (string, []int) {
+	logo, colors := fetchLogo(logo)
+	if logo != "" {
+		return logo, colors
+	}
+	// fallback to platform
+	platform, _, _, _ := host.PlatformInformation()
+	logo, colors = fetchLogo(platform)
+	if logo != "" {
+		return logo, colors
+	}
+	// fallback to generic linux logo
+	return linux, []int{15, 8, 3}
+}
+
+func fetchLogo(logo string) (string, []int) {
 	switch {
 	case strings.HasPrefix(logo, "debian"):
 		return debian, []int{1, 7, 3}
@@ -31,5 +47,5 @@ func getLogo(logo string) (string, []int) {
 	case strings.HasPrefix(logo, "alpine"):
 		return alpine, []int{4, 5, 7, 6}
 	}
-	return linux, []int{15, 8, 3}
+	return "", nil
 }
