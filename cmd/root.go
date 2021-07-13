@@ -101,18 +101,17 @@ func init() {
 	rootCmd.Flags().Bool("timing", false, "show time taken for each info line")
 	rootCmd.Flags().StringP("logo", "l", "", "override platform specific logo")
 	rootCmd.Flags().BoolP("version", "v", false, "version for nfetch")
+	rootCmd.Flags().Bool("show-none", false, "show info lines that have no information")
+
 	viper.BindPFlag("color", rootCmd.PersistentFlags().Lookup("color"))
 	viper.BindPFlag("all", rootCmd.Flags().Lookup("all"))
 	viper.BindPFlag("timing", rootCmd.Flags().Lookup("timing"))
 	viper.BindPFlag("logo", rootCmd.Flags().Lookup("logo"))
+	viper.BindPFlag("show_none", rootCmd.Flags().Lookup("show-none"))
 
 	rootCmd.RegisterFlagCompletionFunc("color", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"auto", "always", "never"}, cobra.ShellCompDirectiveNoFileComp
 	})
-}
-
-func AddCommand(cmd *cobra.Command) {
-	rootCmd.AddCommand(cmd)
 }
 
 func initConfig() {

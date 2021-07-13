@@ -31,6 +31,7 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 	diskResult := make(chan DiskResult)
 
 	showTiming := viper.GetBool("timing")
+	showNone := viper.GetBool("show_none")
 	start := time.Now()
 
 	// start goroutines to render lines
@@ -81,6 +82,14 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 			content, err := contentFunc(config)
 			if err != nil {
 				content = color.ErrorMsg
+			}
+
+			curShowNone := showNone
+			if config.Has("show_none") {
+				curShowNone = config.GetBool("show_none")
+			}
+			if content == "" && (curShowNone || showTiming) {
+				content = "(none)"
 			}
 
 			if showTiming {
@@ -147,7 +156,9 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 		default:
 			// try get from map
 			if res, present := lineResults[line]; present {
-				printLine(aurora.Colorize(res.Title, color.Colors.C1), ": ", res.Content)
+				if res.Content != "" {
+					printLine(aurora.Colorize(res.Title, color.Colors.C1), ": ", res.Content)
+				}
 				break
 			}
 
@@ -155,7 +166,9 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 			result := <-results
 			// check if current result
 			if result.Line == line {
-				printLine(aurora.Colorize(result.Title, color.Colors.C1), ": ", result.Content)
+				if result.Content != "" {
+					printLine(aurora.Colorize(result.Title, color.Colors.C1), ": ", result.Content)
+				}
 			} else {
 				i--
 			}

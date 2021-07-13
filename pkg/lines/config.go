@@ -25,6 +25,15 @@ func (c LineConfig) Get(key string) interface{} {
 	return c.config[key]
 }
 
+func (c LineConfig) Has(key string) bool {
+	_, present := c.config[key]
+	return present
+}
+
+func (c LineConfig) GetBool(key string) bool {
+	return cast.ToBool(c.Get(key))
+}
+
 func (c LineConfig) GetString(key string) string {
 	return cast.ToString(c.Get(key))
 }

@@ -208,7 +208,7 @@ func Pkgs(config LineConfig) (string, error) {
 
 	pkgMap := sysinfo.Pkgs(show)
 	if len(pkgMap) == 0 {
-		return "(none)", nil
+		return "", nil
 	}
 
 	result := make([]string, 0, len(pkgMap))
@@ -233,7 +233,7 @@ func Shell(config LineConfig) (string, error) {
 func Resolution(config LineConfig) (string, error) {
 	displays := sysinfo.Resolution()
 	if len(displays) == 0 {
-		return "(none)", nil
+		return "", nil
 	}
 	parts := make([]string, len(displays))
 	for i, bounds := range displays {
@@ -326,7 +326,7 @@ func Battery(config LineConfig) (string, error) {
 		return "", err
 	}
 	if bt == nil {
-		return "(none)", nil
+		return "", nil
 	}
 	return fmt.Sprintf("%.f%% (%s)", bt.Current/bt.Full*100, bt.State), nil
 }
