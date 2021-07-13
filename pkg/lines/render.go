@@ -108,7 +108,7 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 	var printLine func(a ...interface{})
 
 	if logo == nil {
-		// -1 to account for difference between counting columns and characters
+		// +1 to account for difference between column and character count
 		prefix := CursorRight(offset + 1)
 		printLine = func(a ...interface{}) {
 			ioutils.Print(prefix)
@@ -118,11 +118,16 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 		}
 	} else {
 		// write logo progressively
+		paddingAmt := 0
+		if len(logo) > 0 {
+			paddingAmt = viper.GetInt("padding")
+		}
+		padding := strings.Repeat(" ", paddingAmt)
 		printLine = func(a ...interface{}) {
 			if len(logo) > writtenLines {
-				ioutils.Print(logo[writtenLines], strings.Repeat(" ", offset-len(logo[writtenLines])))
+				ioutils.Print(padding, logo[writtenLines], strings.Repeat(" ", offset-len(logo[writtenLines])))
 			} else {
-				ioutils.Print(strings.Repeat(" ", offset))
+				ioutils.Print(padding, strings.Repeat(" ", offset))
 			}
 			ioutils.Print(a...)
 			ioutils.Println()

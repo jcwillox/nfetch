@@ -24,6 +24,10 @@ func GetLogo() (string, []int) {
 }
 
 func RenderLogo(rawLogoTemplate string) (logo []string, logoWidth int, logoHeight int) {
+	if rawLogoTemplate == "" {
+		return []string{}, 0, 0
+	}
+
 	logoTemplate, err := template.New("logo").Parse(rawLogoTemplate)
 	if err != nil {
 		panic(fmt.Errorf("Unable to parse logo template: %s \n", err))

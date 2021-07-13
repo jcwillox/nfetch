@@ -14,6 +14,7 @@ import (
 	"nfetch/pkg/logo"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var cfg struct {
@@ -50,12 +51,15 @@ var rootCmd = &cobra.Command{
 		renderedLogo, logoWidth, logoHeight := logo.RenderLogo(logoString)
 
 		if logoWidth > 0 {
-			logoWidth += 3
+			logoWidth += viper.GetInt("gap")
 		}
 
 		if !color.NoColor && logoString != "" {
+			paddingAmt := viper.GetInt("padding")
+			padding := strings.Repeat(" ", paddingAmt)
+			logoWidth += paddingAmt
 			for _, line := range renderedLogo {
-				ioutils.Print(line)
+				ioutils.Print(padding, line)
 			}
 			CursorUp(logoHeight)
 		}
@@ -105,6 +109,8 @@ func init() {
 	rootCmd.Flags().BoolP("version", "v", false, "version for nfetch")
 	rootCmd.Flags().Bool("show-none", false, "show info lines that have no information")
 	rootCmd.Flags().Bool("no-image", false, "hide image or logo")
+	rootCmd.Flags().Int("padding", 1, "space before the image")
+	rootCmd.Flags().IntP("gap", "g", 3, "gap between the image and text")
 
 	viper.BindPFlag("color", rootCmd.PersistentFlags().Lookup("color"))
 	viper.BindPFlag("all", rootCmd.Flags().Lookup("all"))
@@ -112,6 +118,8 @@ func init() {
 	viper.BindPFlag("logo", rootCmd.Flags().Lookup("logo"))
 	viper.BindPFlag("show_none", rootCmd.Flags().Lookup("show-none"))
 	viper.BindPFlag("no_image", rootCmd.Flags().Lookup("no-image"))
+	viper.BindPFlag("padding", rootCmd.Flags().Lookup("padding"))
+	viper.BindPFlag("gap", rootCmd.Flags().Lookup("gap"))
 
 	rootCmd.RegisterFlagCompletionFunc("color", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"auto", "always", "never"}, cobra.ShellCompDirectiveNoFileComp
