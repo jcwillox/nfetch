@@ -43,7 +43,9 @@ var rootCmd = &cobra.Command{
 			color.SetColors(logoColors...)
 		}
 
-		// TODO: if logoString empty or no image don't render logo
+		if viper.GetBool("no_image") {
+			logoString = ""
+		}
 
 		renderedLogo, logoWidth, logoHeight := logo.RenderLogo(logoString)
 
@@ -102,12 +104,14 @@ func init() {
 	rootCmd.Flags().StringP("logo", "l", "", "override platform specific logo")
 	rootCmd.Flags().BoolP("version", "v", false, "version for nfetch")
 	rootCmd.Flags().Bool("show-none", false, "show info lines that have no information")
+	rootCmd.Flags().Bool("no-image", false, "hide image or logo")
 
 	viper.BindPFlag("color", rootCmd.PersistentFlags().Lookup("color"))
 	viper.BindPFlag("all", rootCmd.Flags().Lookup("all"))
 	viper.BindPFlag("timing", rootCmd.Flags().Lookup("timing"))
 	viper.BindPFlag("logo", rootCmd.Flags().Lookup("logo"))
 	viper.BindPFlag("show_none", rootCmd.Flags().Lookup("show-none"))
+	viper.BindPFlag("no_image", rootCmd.Flags().Lookup("no-image"))
 
 	rootCmd.RegisterFlagCompletionFunc("color", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"auto", "always", "never"}, cobra.ShellCompDirectiveNoFileComp
