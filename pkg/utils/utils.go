@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"bytes"
 	"github.com/mitchellh/go-ps"
 	"os"
 	"os/exec"
@@ -87,4 +88,17 @@ func HasPrefixMulti(s string, prefixes ...string) bool {
 		}
 	}
 	return false
+}
+
+func ReadFileString(path string) (string, error) {
+	content, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			// ignore error is the file doesn't exist
+			return "", nil
+		} else {
+			return "", err
+		}
+	}
+	return string(bytes.TrimRight(content, "\n")), nil
 }

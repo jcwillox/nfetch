@@ -132,7 +132,18 @@ func Distro() string {
 }
 
 func Motherboard() (MotherboardInfo, error) {
-	return MotherboardInfo{}, nil
+	vendor, err := utils.ReadFileString("/sys/class/dmi/id/board_vendor")
+	if err != nil {
+		return MotherboardInfo{}, err
+	}
+	name, err := utils.ReadFileString("/sys/class/dmi/id/board_name")
+	if err != nil {
+		return MotherboardInfo{}, err
+	}
+	return MotherboardInfo{
+		Manufacturer: vendor,
+		Product:      name,
+	}, nil
 }
 
 func Model() (ModelInfo, error) {
