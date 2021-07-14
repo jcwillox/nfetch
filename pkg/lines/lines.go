@@ -22,6 +22,7 @@ const (
 	LineKernel      = "kernel"
 	LineUptime      = "uptime"
 	LineMotherboard = "motherboard"
+	LineBios        = "bios"
 	LinePkgs        = "pkgs"
 	LineShell       = "shell"
 	LineResolution  = "resolution"
@@ -45,6 +46,7 @@ var FuncMap = map[string]func(config LineConfig) (string, error){
 	LineHost:        Model,
 	LineKernel:      Kernel,
 	LineMotherboard: Motherboard,
+	LineBios:        Bios,
 	LineUptime:      Uptime,
 	LinePkgs:        Pkgs,
 	LineShell:       Shell,
@@ -68,6 +70,7 @@ var DefaultTitleMap = map[string]string{
 	LineHost:        "Host",
 	LineKernel:      "Kernel",
 	LineMotherboard: "Motherboard",
+	LineBios:        "Bios",
 	LineUptime:      "Uptime",
 	LinePkgs:        "Packages",
 	LineShell:       "Shell",
@@ -93,6 +96,7 @@ var AllLines = []interface{}{
 	LineHost,
 	LineKernel,
 	LineMotherboard,
+	LineBios,
 	LineUptime,
 	LinePkgs,
 	LineShell,
@@ -179,6 +183,14 @@ func Motherboard(config LineConfig) (string, error) {
 		return "", err
 	}
 	return info.Manufacturer + " " + info.Product, nil
+}
+
+func Bios(config LineConfig) (string, error) {
+	info, err := sysinfo.Bios()
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s %s (%s)", info.Manufacturer, info.Version, info.ReleaseDate), nil
 }
 
 func Uptime(config LineConfig) (string, error) {

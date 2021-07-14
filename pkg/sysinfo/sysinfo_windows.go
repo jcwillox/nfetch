@@ -12,9 +12,11 @@ import (
 	"net"
 	"strings"
 	"sync"
+	"time"
 )
 
 const wqlBaseboard = "SELECT Manufacturer, Product FROM Win32_BaseBoard"
+const wqlBios = "SELECT Manufacturer, SMBIOSBIOSVersion, ReleaseDate FROM Win32_BIOS"
 const wqlModel = "SELECT Manufacturer, Model FROM Win32_ComputerSystem"
 const wqlCPU = "SELECT Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed FROM Win32_Processor"
 const wqlGPU = "SELECT Name FROM Win32_VideoController"
@@ -23,6 +25,12 @@ const wqlPageFile = "SELECT CurrentUsage, AllocatedBaseSize FROM Win32_PageFileU
 type Win32Baseboard struct {
 	Manufacturer *string
 	Product      *string
+}
+
+type Win32Bios struct {
+	Manufacturer      string
+	SMBIOSBIOSVersion string
+	ReleaseDate       time.Time
 }
 
 type Win32Model struct {
@@ -92,6 +100,22 @@ func Motherboard() (MotherboardInfo, error) {
 		}, nil
 	}
 	return MotherboardInfo{}, nil
+}
+
+func Bios() (BiosInfo, error) {
+	var win32BiosDescriptions []Win32Bios
+	conn := WmiSharedConnection()
+	if err := conn.Query(wqlBios, &win32BiosDescriptions); err != nil {
+		return BiosInfo{}, err
+	}
+	if len(win32BiosDescriptions) > 0 {
+		return BiosInfo{
+			Manufacturer: win32BiosDescriptions[0].Manufacturer,
+			Version:      win32BiosDescriptions[0].SMBIOSBIOSVersion,
+			ReleaseDate:  win32BiosDescriptions[0].ReleaseDate.Format("2006-01-02"),
+		}, nil
+	}
+	return BiosInfo{}, nil
 }
 
 func Model() (ModelInfo, error) {

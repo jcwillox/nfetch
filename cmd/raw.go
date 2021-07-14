@@ -25,6 +25,7 @@ var rawArgs = []string{
 	"model",
 	lines.LineKernel,
 	lines.LineMotherboard,
+	lines.LineBios,
 	lines.LineUptime,
 	lines.LinePkgs,
 	lines.LineShell,
@@ -75,6 +76,8 @@ var rawCmd = &cobra.Command{
 			printInfo(host.KernelVersion())
 		case lines.LineMotherboard:
 			printInfo(sysinfo.Motherboard())
+		case lines.LineBios:
+			printInfo(sysinfo.Bios())
 		case lines.LineUptime:
 			printInfo(host.Uptime())
 		case lines.LinePkgs:

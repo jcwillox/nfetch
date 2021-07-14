@@ -32,6 +32,12 @@ type MotherboardInfo struct {
 	Product      string `json:"product"`
 }
 
+type BiosInfo struct {
+	Manufacturer string `json:"manufacturer"`
+	Version      string `json:"version"`
+	ReleaseDate  string `json:"release_date"`
+}
+
 type CPUInfo struct {
 	Model   string  `json:"model"`
 	Cores   int32   `json:"cores"`

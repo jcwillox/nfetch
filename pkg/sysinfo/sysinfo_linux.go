@@ -16,6 +16,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func cpuInfo() (CPUInfo, error) {
@@ -143,6 +144,31 @@ func Motherboard() (MotherboardInfo, error) {
 	return MotherboardInfo{
 		Manufacturer: vendor,
 		Product:      name,
+	}, nil
+}
+
+func Bios() (BiosInfo, error) {
+	vendor, err := utils.ReadFileString("/sys/class/dmi/id/bios_vendor")
+	if err != nil {
+		return BiosInfo{}, nil
+	}
+	version, err := utils.ReadFileString("/sys/class/dmi/id/bios_version")
+	if err != nil {
+		return BiosInfo{}, nil
+	}
+	date, err := utils.ReadFileString("/sys/class/dmi/id/bios_date")
+	if err != nil {
+		return BiosInfo{}, nil
+	}
+	// try format US date strings
+	dt, err := time.Parse("01/02/2006", date)
+	if err == nil {
+		date = dt.Format("2006-01-02")
+	}
+	return BiosInfo{
+		Manufacturer: vendor,
+		Version:      version,
+		ReleaseDate:  date,
 	}, nil
 }
 
