@@ -18,6 +18,9 @@ var kali string
 //go:embed logos/alpine.txt
 var alpine string
 
+//go:embed logos/proxmox.txt
+var proxmox string
+
 //go:embed logos/linux.txt
 var linux string
 
@@ -46,6 +49,8 @@ func fetchLogo(logo string) (string, []int) {
 		return kali, []int{4, 8}
 	case strings.HasPrefix(logo, "alpine"):
 		return alpine, []int{4, 5, 7, 6}
+	case strings.HasPrefix(logo, "proxmox"):
+		return proxmox, []int{7, 202}
 	}
 	return "", nil
 }
