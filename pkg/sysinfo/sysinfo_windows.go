@@ -87,7 +87,7 @@ func Distro() string {
 	return strings.TrimPrefix(platform, "Microsoft ")
 }
 
-func Motherboard() (MotherboardInfo, error) {
+func motherboardWmi() (MotherboardInfo, error) {
 	var win32BaseboardDescriptions []Win32Baseboard
 	conn := WmiSharedConnection()
 	if err := conn.Query(wqlBaseboard, &win32BaseboardDescriptions); err != nil {
@@ -102,7 +102,23 @@ func Motherboard() (MotherboardInfo, error) {
 	return MotherboardInfo{}, nil
 }
 
-func Bios() (BiosInfo, error) {
+func Motherboard() (MotherboardInfo, error) {
+	manufacturer, err := ReadRegistryString(registry.LOCAL_MACHINE, `HARDWARE\DESCRIPTION\System\BIOS`, "BaseBoardManufacturer")
+	if err != nil {
+		return motherboardWmi()
+	}
+	product, err := ReadRegistryString(registry.LOCAL_MACHINE, `HARDWARE\DESCRIPTION\System\BIOS`, "BaseBoardProduct")
+	if err != nil {
+		return motherboardWmi()
+	}
+	return MotherboardInfo{
+		Manufacturer: manufacturer,
+		Product:      product,
+	}, nil
+
+}
+
+func biosWmi() (BiosInfo, error) {
 	var win32BiosDescriptions []Win32Bios
 	conn := WmiSharedConnection()
 	if err := conn.Query(wqlBios, &win32BiosDescriptions); err != nil {
@@ -118,7 +134,33 @@ func Bios() (BiosInfo, error) {
 	return BiosInfo{}, nil
 }
 
-func Model() (ModelInfo, error) {
+func Bios() (BiosInfo, error) {
+	vendor, err := ReadRegistryString(registry.LOCAL_MACHINE, `HARDWARE\DESCRIPTION\System\BIOS`, "BIOSVendor")
+	if err != nil {
+		return biosWmi()
+	}
+	version, err := ReadRegistryString(registry.LOCAL_MACHINE, `HARDWARE\DESCRIPTION\System\BIOS`, "BIOSVersion")
+	if err != nil {
+		return biosWmi()
+	}
+	date, err := ReadRegistryString(registry.LOCAL_MACHINE, `HARDWARE\DESCRIPTION\System\BIOS`, "BIOSReleaseDate")
+	if err != nil {
+		return biosWmi()
+	}
+	// try format US date strings
+	dt, err := time.Parse("01/02/2006", date)
+	if err == nil {
+		date = dt.Format("2006-01-02")
+	}
+	return BiosInfo{
+		Manufacturer: vendor,
+		Version:      version,
+		ReleaseDate:  date,
+	}, nil
+
+}
+
+func modelWmi() (ModelInfo, error) {
 	var win32ModelDescriptions []Win32Model
 	conn := WmiSharedConnection()
 	if err := conn.Query(wqlModel, &win32ModelDescriptions); err != nil {
@@ -131,6 +173,21 @@ func Model() (ModelInfo, error) {
 		}, nil
 	}
 	return ModelInfo{}, nil
+}
+
+func Model() (ModelInfo, error) {
+	manufacturer, err := ReadRegistryString(registry.LOCAL_MACHINE, `HARDWARE\DESCRIPTION\System\BIOS`, "SystemManufacturer")
+	if err != nil {
+		return modelWmi()
+	}
+	product, err := ReadRegistryString(registry.LOCAL_MACHINE, `HARDWARE\DESCRIPTION\System\BIOS`, "SystemProductName")
+	if err != nil {
+		return modelWmi()
+	}
+	return ModelInfo{
+		Manufacturer: manufacturer,
+		Model:        product,
+	}, nil
 }
 
 func Theme() (uint64, uint64, error) {
