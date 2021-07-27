@@ -2,7 +2,6 @@ package lines
 
 import (
 	"fmt"
-	"github.com/logrusorgru/aurora/v3"
 	"github.com/shirou/gopsutil/host"
 	"golang.org/x/text/language/display"
 	"nfetch/internal/color"
@@ -119,11 +118,11 @@ var AllLines = []interface{}{
 }
 
 func Title() string {
-	return fmt.Sprintf("%s@%s", aurora.Colorize(sysinfo.Username(), color.Colors.C1), aurora.Colorize(sysinfo.Hostname(), color.Colors.C1))
+	return fmt.Sprint(color.Title(sysinfo.Username()), color.At("@"), color.Title(sysinfo.Hostname()))
 }
 
 func Dashes() string {
-	return strings.Repeat("-", len(sysinfo.Username())+len(sysinfo.Hostname())+1)
+	return color.Dashes(strings.Repeat("-", len(sysinfo.Username())+len(sysinfo.Hostname())+1))
 }
 
 func Colorbar() []string {

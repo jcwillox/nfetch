@@ -7,6 +7,7 @@ import (
 	"github.com/anthonynsimon/bild/transform"
 	"github.com/spf13/viper"
 	"nfetch/internal/color"
+	. "nfetch/pkg"
 	"nfetch/pkg/ioutils"
 	"nfetch/pkg/sysinfo"
 	"strings"
@@ -23,7 +24,7 @@ func GetLogo() (string, []int) {
 	return getLogo(logo)
 }
 
-func RenderLogo(rawLogoTemplate string) (logo []string, logoWidth int, logoHeight int) {
+func RenderLogo(rawLogoTemplate string, colors []int) (logo []string, logoWidth int, logoHeight int) {
 	if rawLogoTemplate == "" {
 		return []string{}, 0, 0
 	}
@@ -74,10 +75,18 @@ func RenderLogo(rawLogoTemplate string) (logo []string, logoWidth int, logoHeigh
 	buff.Reset()
 
 	// parse with colours
-	colorData.C1 = "\x1b[" + color.Colors.C1.Nos(true) + "m"
-	colorData.C2 = "\x1b[" + color.Colors.C2.Nos(true) + "m"
-	colorData.C3 = "\x1b[" + color.Colors.C3.Nos(true) + "m"
-	colorData.C4 = "\x1b[" + color.Colors.C4.Nos(true) + "m"
+	if len(colors) > 0 {
+		colorData.C1 = ColorIndexFg(colors[0])
+	}
+	if len(colors) > 1 {
+		colorData.C2 = ColorIndexFg(colors[1])
+	}
+	if len(colors) > 2 {
+		colorData.C3 = ColorIndexFg(colors[2])
+	}
+	if len(colors) > 3 {
+		colorData.C4 = ColorIndexFg(colors[3])
+	}
 
 	err = logoTemplate.Execute(&buff, colorData)
 	if err != nil {

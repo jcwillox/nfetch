@@ -39,10 +39,7 @@ var rootCmd = &cobra.Command{
 		}
 
 		logoString, logoColors := logo.GetLogo()
-
-		if !color.NoColor {
-			color.SetColors(logoColors...)
-		}
+		color.SetFromLogoColors(logoColors)
 
 		if viper.GetBool("no_image") {
 			logoString = ""
@@ -58,6 +55,7 @@ var rootCmd = &cobra.Command{
 			paddingAmt := viper.GetInt("padding")
 			padding := strings.Repeat(" ", paddingAmt)
 			logoWidth += paddingAmt
+			ioutils.Print("\x1b[1m")
 			for _, line := range renderedLogo {
 				ioutils.Print(padding, line)
 			}

@@ -11,9 +11,9 @@ require (
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/k0kubun/pp/v3 v3.0.7
 	github.com/kbinani/screenshot v0.0.0-20210326165202-b96eb3309bb0
-	github.com/logrusorgru/aurora/v3 v3.0.0
-	github.com/mattn/go-colorable v0.1.8 // indirect
+	github.com/mattn/go-colorable v0.1.8
 	github.com/mattn/go-isatty v0.0.13
+	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d
 	github.com/miekg/dns v1.1.42
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/go-ps v1.0.0

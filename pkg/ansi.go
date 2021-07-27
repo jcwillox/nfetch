@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"fmt"
 	"nfetch/pkg/ioutils"
 	"strconv"
 )
@@ -31,4 +32,14 @@ func EnableLineWrap() {
 
 func DisableLineWrap() {
 	ioutils.Print("\x1b[?7l")
+}
+
+func ColorIndexFg(index int) string {
+	if index < 8 {
+		return fmt.Sprintf("\x1b[%dm", index+30)
+	}
+	if index < 16 {
+		return fmt.Sprintf("\x1b[%dm", index+82)
+	}
+	return fmt.Sprintf("\x1b[38;5;%dm", index)
 }

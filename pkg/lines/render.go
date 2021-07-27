@@ -2,7 +2,7 @@ package lines
 
 import (
 	"fmt"
-	"github.com/logrusorgru/aurora/v3"
+	"github.com/mgutz/ansi"
 	"github.com/spf13/viper"
 	"nfetch/internal/color"
 	. "nfetch/pkg"
@@ -73,7 +73,7 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 				results <- Result{
 					Line:    line,
 					Title:   title,
-					Content: color.Error("(does not exist)").String(),
+					Content: color.Error("(does not exist)"),
 				}
 				return
 			}
@@ -93,7 +93,7 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 			}
 
 			if showTiming {
-				content = fmt.Sprint(content, color.AU.Yellow(" [took "), color.AU.Red(time.Since(start)).String(), color.AU.Yellow("]").String())
+				content = fmt.Sprint(content, ansi.Yellow, " [took ", ansi.Red, time.Since(start), ansi.Yellow, "]", ansi.Reset)
 			}
 
 			results <- Result{
@@ -156,13 +156,13 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 		case LineDisk:
 			diskResult := <-diskResult
 			for i, title := range diskResult.Titles {
-				printLine(aurora.Colorize(title, color.Colors.C1), ": ", diskResult.Content[i])
+				printLine(color.Subtitle(title), color.Separator(": "), color.Info(diskResult.Content[i]))
 			}
 		default:
 			// try get from map
 			if res, present := lineResults[line]; present {
 				if res.Content != "" {
-					printLine(aurora.Colorize(res.Title, color.Colors.C1), ": ", res.Content)
+					printLine(color.Subtitle(res.Title), color.Separator(": "), color.Info(res.Content))
 				}
 				break
 			}
@@ -172,7 +172,7 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 			// check if current result
 			if result.Line == line {
 				if result.Content != "" {
-					printLine(aurora.Colorize(result.Title, color.Colors.C1), ": ", result.Content)
+					printLine(color.Subtitle(result.Title), color.Separator(": "), color.Info(result.Content))
 				}
 			} else {
 				i--
