@@ -7,7 +7,7 @@ require (
 	github.com/Xuanwo/go-locale v1.0.0
 	github.com/anthonynsimon/bild v0.13.0
 	github.com/distatus/battery v0.10.0
-	github.com/jcwillox/emerald v0.1.0
+	github.com/jcwillox/emerald v0.2.0
 	github.com/k0kubun/pp/v3 v3.0.7
 	github.com/kbinani/screenshot v0.0.0-20210326165202-b96eb3309bb0
 	github.com/miekg/dns v1.1.42

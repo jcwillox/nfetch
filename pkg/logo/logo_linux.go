@@ -24,7 +24,7 @@ var proxmox string
 //go:embed logos/linux.txt
 var linux string
 
-func getLogo(logo string) (string, []int) {
+func GetDistroLogo(logo string) (string, []string) {
 	logo, colors := fetchLogo(logo)
 	if logo != "" {
 		return logo, colors
@@ -36,21 +36,21 @@ func getLogo(logo string) (string, []int) {
 		return logo, colors
 	}
 	// fallback to generic linux logo
-	return linux, []int{15, 8, 3}
+	return linux, []string{"15", "8", "3"}
 }
 
-func fetchLogo(logo string) (string, []int) {
+func fetchLogo(logo string) (string, []string) {
 	switch {
 	case strings.HasPrefix(logo, "debian"):
-		return debian, []int{1, 7, 3}
+		return debian, []string{"1", "7", "3"}
 	case strings.HasPrefix(logo, "ubuntu"):
-		return ubuntu, []int{1, 7, 3}
+		return ubuntu, []string{"1", "7", "3"}
 	case strings.HasPrefix(logo, "kali"):
-		return kali, []int{4, 8}
+		return kali, []string{"4", "8"}
 	case strings.HasPrefix(logo, "alpine"):
-		return alpine, []int{4, 5, 7, 6}
+		return alpine, []string{"4", "5", "7", "6"}
 	case strings.HasPrefix(logo, "proxmox"):
-		return proxmox, []int{7, 202}
+		return proxmox, []string{"7", "202"}
 	}
 	return "", nil
 }

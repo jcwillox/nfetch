@@ -14,11 +14,11 @@ var windows11 string
 //go:embed logos/windows_legacy.txt
 var windowsLegacy string
 
-func getLogo(logo string) (string, []int) {
+func GetDistroLogo(logo string) (string, []string) {
 	if strings.HasPrefix(logo, "windows 10") {
-		return windows10, []int{4}
+		return windows10, []string{"14"}
 	} else if strings.HasPrefix(logo, "windows 11") {
-		return windows11, []int{12, 14, 4}
+		return windows11, []string{"12", "14", "4"}
 	}
-	return windowsLegacy, []int{1, 2, 4, 3}
+	return windowsLegacy, []string{"1", "2", "4", "3"}
 }

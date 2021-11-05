@@ -37,14 +37,17 @@ var rootCmd = &cobra.Command{
 			defer emerald.EnableLineWrap()
 		}
 
-		logoString, logoColors := logo.GetLogo()
-		color.SetFromLogoColors(logoColors)
+		logoString, colors := logo.GetLogo()
+		if viper.IsSet("colors") {
+			colors = viper.GetStringSlice("colors")
+		}
+		color.SetColors(colors)
 
 		if viper.GetBool("no_image") {
 			logoString = ""
 		}
 
-		renderedLogo, logoWidth, logoHeight := logo.RenderLogo(logoString, logoColors)
+		renderedLogo, logoWidth, logoHeight := logo.RenderLogo(logoString, colors)
 
 		if logoWidth > 0 {
 			logoWidth += viper.GetInt("gap")
@@ -54,7 +57,6 @@ var rootCmd = &cobra.Command{
 			paddingAmt := viper.GetInt("padding")
 			padding := strings.Repeat(" ", paddingAmt)
 			logoWidth += paddingAmt
-			emerald.Print("\x1b[1m")
 			for _, line := range renderedLogo {
 				emerald.Print(padding, line)
 			}
@@ -108,6 +110,8 @@ func init() {
 	rootCmd.Flags().Bool("no-image", false, "hide image or logo")
 	rootCmd.Flags().Int("padding", 1, "space before the image")
 	rootCmd.Flags().IntP("gap", "g", 3, "gap between the image and text")
+	rootCmd.Flags().StringSlice("colors", nil, "override the distro colors this applies to the text and logo colors")
+	rootCmd.Flags().StringSlice("logo-colors", nil, "override the logo colors specifically")
 
 	viper.BindPFlag("color", rootCmd.PersistentFlags().Lookup("color"))
 	viper.BindPFlag("all", rootCmd.Flags().Lookup("all"))
@@ -117,6 +121,8 @@ func init() {
 	viper.BindPFlag("no_image", rootCmd.Flags().Lookup("no-image"))
 	viper.BindPFlag("padding", rootCmd.Flags().Lookup("padding"))
 	viper.BindPFlag("gap", rootCmd.Flags().Lookup("gap"))
+	viper.BindPFlag("colors", rootCmd.Flags().Lookup("colors"))
+	viper.BindPFlag("logo_colors", rootCmd.Flags().Lookup("logo-colors"))
 
 	rootCmd.RegisterFlagCompletionFunc("color", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"auto", "always", "never"}, cobra.ShellCompDirectiveNoFileComp

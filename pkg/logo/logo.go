@@ -7,22 +7,25 @@ import (
 	"github.com/anthonynsimon/bild/transform"
 	"github.com/jcwillox/emerald"
 	"github.com/spf13/viper"
+	"nfetch/internal/color"
 	"nfetch/pkg/sysinfo"
+	"strconv"
 	"strings"
 	"text/template"
 )
 
-func GetLogo() (string, []int) {
+// GetLogo returns the logo and default colors for the current distro
+func GetLogo() (string, []string) {
 	logo := viper.GetString("logo")
 	if logo == "" {
 		logo = sysinfo.Distro()
 	}
 	// case-insensitive
 	logo = strings.ToLower(logo)
-	return getLogo(logo)
+	return GetDistroLogo(logo)
 }
 
-func RenderLogo(rawLogoTemplate string, colors []int) (logo []string, logoWidth int, logoHeight int) {
+func RenderLogo(rawLogoTemplate string, colors []string) (logo []string, logoWidth int, logoHeight int) {
 	if rawLogoTemplate == "" {
 		return []string{}, 0, 0
 	}
@@ -32,12 +35,18 @@ func RenderLogo(rawLogoTemplate string, colors []int) (logo []string, logoWidth 
 		panic(fmt.Errorf("Unable to parse logo template: %s \n", err))
 	}
 
-	colorData := struct {
-		C1 string
-		C2 string
-		C3 string
-		C4 string
-	}{}
+	colorsLen := len(colors)
+	if viper.IsSet("logo_colors") {
+		colors = viper.GetStringSlice("logo_colors")
+		if len(colors) > colorsLen {
+			colorsLen = len(colors)
+		}
+	}
+
+	colorData := map[string]string{}
+	for i := 0; i < colorsLen; i++ {
+		colorData["C"+strconv.Itoa(i+1)] = ""
+	}
 
 	// parse without colours
 	var buff bytes.Buffer
@@ -73,17 +82,8 @@ func RenderLogo(rawLogoTemplate string, colors []int) (logo []string, logoWidth 
 	buff.Reset()
 
 	// parse with colours
-	if len(colors) > 0 {
-		colorData.C1 = emerald.ColorIndexFg(colors[0])
-	}
-	if len(colors) > 1 {
-		colorData.C2 = emerald.ColorIndexFg(colors[1])
-	}
-	if len(colors) > 2 {
-		colorData.C3 = emerald.ColorIndexFg(colors[2])
-	}
-	if len(colors) > 3 {
-		colorData.C4 = emerald.ColorIndexFg(colors[3])
+	for i, c := range colors {
+		colorData["C"+strconv.Itoa(i+1)] = color.ColorizerCode(c, true)
 	}
 
 	err = logoTemplate.Execute(&buff, colorData)

@@ -2,33 +2,50 @@ package color
 
 import (
 	"github.com/jcwillox/emerald"
-	"strconv"
+	"strings"
 )
 
 var (
-	Error    func(string) string
-	ErrorMsg string
+	Title     emerald.Colorizer
+	At        emerald.Colorizer
+	Dashes    emerald.Colorizer
+	Subtitle  emerald.Colorizer
+	Separator emerald.Colorizer
+	Info      emerald.Colorizer
+	Error     emerald.Colorizer
+	ErrorMsg  string
 )
 
-var (
-	Title     func(string) string
-	At        func(string) string
-	Dashes    func(string) string
-	Subtitle  func(string) string
-	Separator func(string) string
-	Info      func(string) string
-)
+func ColorizerCode(style string, bold bool) string {
+	colorCode := emerald.ColorCode(style)
+	if bold && !strings.HasPrefix(colorCode, "\x1b[0;1") {
+		return strings.Replace(colorCode, "[0;", "[0;1;", 1)
+	}
+	return colorCode
+}
 
-// SetFromLogoColors sets the text colors based on the logo colors
-func SetFromLogoColors(colors []int) {
+func ColorizerFunc(style string, bold bool) emerald.Colorizer {
+	if !bold || style == "" {
+		return emerald.ColorFunc(style)
+	}
+	colorCode := ColorizerCode(style, bold)
+	return func(s string) string {
+		if !emerald.ColorEnabled || s == "" {
+			return s
+		}
+		return colorCode + s + emerald.Reset
+	}
+}
+
+func SetColors(colors []string) {
 	if emerald.ColorEnabled {
 		if len(colors) > 0 {
-			Title = emerald.ColorFunc(strconv.Itoa(colors[0]) + "+b")
+			Title = ColorizerFunc(colors[0], true)
 		}
-		if len(colors) < 2 || colors[1] == 7 || colors[1] == 15 {
+		if len(colors) < 2 || colors[1] == "7" || colors[1] == "15" {
 			Subtitle = Title
 		} else {
-			Subtitle = emerald.ColorFunc(strconv.Itoa(colors[1]) + "+b")
+			Subtitle = ColorizerFunc(colors[1], true)
 		}
 		At = emerald.ColorFunc("white")
 		Dashes = At
