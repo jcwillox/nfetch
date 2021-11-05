@@ -4,12 +4,11 @@ import (
 	"bytes"
 	_ "embed"
 	"fmt"
+	"github.com/jcwillox/emerald"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"nfetch/internal/color"
-	. "nfetch/pkg"
-	"nfetch/pkg/ioutils"
 	"nfetch/pkg/lines"
 	"nfetch/pkg/logo"
 	"os"
@@ -31,11 +30,11 @@ var rootCmd = &cobra.Command{
 	Short:   "A truly cross-platform alternative to neofetch",
 	Version: "0.0.1",
 	Run: func(cmd *cobra.Command, args []string) {
-		if !color.NoColor {
-			HideCursor()
-			DisableLineWrap()
-			defer ShowCursor()
-			defer EnableLineWrap()
+		if emerald.ColorEnabled {
+			emerald.HideCursor()
+			emerald.DisableLineWrap()
+			defer emerald.ShowCursor()
+			defer emerald.EnableLineWrap()
 		}
 
 		logoString, logoColors := logo.GetLogo()
@@ -45,21 +44,21 @@ var rootCmd = &cobra.Command{
 			logoString = ""
 		}
 
-		renderedLogo, logoWidth, logoHeight := logo.RenderLogo(logoString)
+		renderedLogo, logoWidth, logoHeight := logo.RenderLogo(logoString, logoColors)
 
 		if logoWidth > 0 {
 			logoWidth += viper.GetInt("gap")
 		}
 
-		if !color.NoColor && logoString != "" {
+		if emerald.ColorEnabled && logoString != "" {
 			paddingAmt := viper.GetInt("padding")
 			padding := strings.Repeat(" ", paddingAmt)
 			logoWidth += paddingAmt
-			ioutils.Print("\x1b[1m")
+			emerald.Print("\x1b[1m")
 			for _, line := range renderedLogo {
-				ioutils.Print(padding, line)
+				emerald.Print(padding, line)
 			}
-			CursorUp(logoHeight)
+			emerald.CursorUp(logoHeight)
 		}
 
 		// render lines
@@ -74,20 +73,20 @@ var rootCmd = &cobra.Command{
 			}
 		}
 
-		if !color.NoColor {
+		if emerald.ColorEnabled {
 			writtenLines := lines.RenderLines(logoWidth, showLines, nil)
 
 			// move cursor back to the bottom
 			diff := logoHeight - writtenLines
 			if diff > 0 {
-				CursorDown(diff)
+				emerald.CursorDown(diff)
 			}
 		} else {
 			lines.RenderLines(logoWidth, showLines, renderedLogo)
 		}
 
 		// print a final blank line
-		ioutils.Println()
+		emerald.Println()
 	},
 }
 
@@ -167,10 +166,10 @@ func initConfig() {
 	// handle global flags
 	switch viper.GetString("color") {
 	case "auto":
-		color.InitColors(ioutils.IsTerminal)
+		emerald.AutoSetColorState()
 	case "always":
-		color.InitColors(true)
+		emerald.SetColorState(true)
 	case "never":
-		color.InitColors(false)
+		emerald.SetColorState(false)
 	}
 }

@@ -1,14 +1,13 @@
 package color
 
 import (
-	"github.com/mgutz/ansi"
+	"github.com/jcwillox/emerald"
 	"strconv"
 )
 
 var (
 	Error    func(string) string
 	ErrorMsg string
-	NoColor  bool
 )
 
 var (
@@ -20,36 +19,31 @@ var (
 	Info      func(string) string
 )
 
-func InitColors(enableColors bool) {
-	NoColor = !enableColors
-	if NoColor {
-		ansi.DisableColors(true)
-	}
-	Error = ansi.ColorFunc("red")
-	ErrorMsg = Error("(error)")
-}
-
 // SetFromLogoColors sets the text colors based on the logo colors
 func SetFromLogoColors(colors []int) {
-	if NoColor {
+	if emerald.ColorEnabled {
+		if len(colors) > 0 {
+			Title = emerald.ColorFunc(strconv.Itoa(colors[0]) + "+b")
+		}
+		if len(colors) < 2 || colors[1] == 7 || colors[1] == 15 {
+			Subtitle = Title
+		} else {
+			Subtitle = emerald.ColorFunc(strconv.Itoa(colors[1]) + "+b")
+		}
+		At = emerald.ColorFunc("white")
+		Dashes = At
+		Separator = At
+		Info = At
+		Error = emerald.ColorFunc("red")
+		ErrorMsg = Error("(error)")
+	} else {
 		Title = func(s string) string { return s }
 		At = Title
 		Dashes = Title
 		Subtitle = Title
 		Separator = Title
 		Info = Title
-	} else {
-		if len(colors) > 0 {
-			Title = ansi.ColorFunc(strconv.Itoa(colors[0]) + "+b")
-		}
-		if len(colors) < 2 || colors[1] == 7 || colors[1] == 15 {
-			Subtitle = Title
-		} else {
-			Subtitle = ansi.ColorFunc(strconv.Itoa(colors[1]) + "+b")
-		}
-		At = ansi.ColorFunc("white")
-		Dashes = At
-		Separator = At
-		Info = At
+		Error = Title
+		ErrorMsg = "(error)"
 	}
 }

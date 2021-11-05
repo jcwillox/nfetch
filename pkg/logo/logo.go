@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"github.com/anthonynsimon/bild/imgio"
 	"github.com/anthonynsimon/bild/transform"
+	"github.com/jcwillox/emerald"
 	"github.com/spf13/viper"
-	"nfetch/internal/color"
-	. "nfetch/pkg"
-	"nfetch/pkg/ioutils"
 	"nfetch/pkg/sysinfo"
 	"strings"
 	"text/template"
@@ -63,12 +61,12 @@ func RenderLogo(rawLogoTemplate string, colors []int) (logo []string, logoWidth 
 			logoWidth = length
 		}
 
-		if color.NoColor {
+		if !emerald.ColorEnabled {
 			lines = append(lines, line)
 		}
 	}
 
-	if color.NoColor {
+	if !emerald.ColorEnabled {
 		return lines, logoWidth, logoHeight
 	}
 
@@ -76,16 +74,16 @@ func RenderLogo(rawLogoTemplate string, colors []int) (logo []string, logoWidth 
 
 	// parse with colours
 	if len(colors) > 0 {
-		colorData.C1 = ColorIndexFg(colors[0])
+		colorData.C1 = emerald.ColorIndexFg(colors[0])
 	}
 	if len(colors) > 1 {
-		colorData.C2 = ColorIndexFg(colors[1])
+		colorData.C2 = emerald.ColorIndexFg(colors[1])
 	}
 	if len(colors) > 2 {
-		colorData.C3 = ColorIndexFg(colors[2])
+		colorData.C3 = emerald.ColorIndexFg(colors[2])
 	}
 	if len(colors) > 3 {
-		colorData.C4 = ColorIndexFg(colors[3])
+		colorData.C4 = emerald.ColorIndexFg(colors[3])
 	}
 
 	err = logoTemplate.Execute(&buff, colorData)
@@ -107,20 +105,20 @@ func RenderLogo(rawLogoTemplate string, colors []int) (logo []string, logoWidth 
 func PrintAsciiImage(path string) {
 	img, err := imgio.Open(path)
 	if err != nil {
-		ioutils.Println(err)
+		emerald.Println(err)
 		return
 	}
 
 	width := img.Bounds().Max.X
 	height := img.Bounds().Max.Y
 
-	ioutils.Println(width, height)
+	emerald.Println(width, height)
 
 	newWidth := 35
 	ratio := float32(height) / float32(width)
 	newHeight := int(ratio*float32(newWidth) + 0.5)
 
-	ioutils.Println(newWidth, newHeight, ratio)
+	emerald.Println(newWidth, newHeight, ratio)
 
 	resized := transform.Resize(img, newWidth, newHeight, transform.Linear)
 
@@ -135,8 +133,8 @@ func PrintAsciiImage(path string) {
 			}
 			foreRGBA := resized.RGBAAt(x, y)
 			foreVT := fmt.Sprintf("\x1b[38;2;%d;%d;%dm", foreRGBA.R, foreRGBA.G, foreRGBA.B)
-			ioutils.Print(foreVT + backVT + block + "\x1b[0m")
+			emerald.Print(foreVT + backVT + block + "\x1b[0m")
 		}
-		ioutils.Println()
+		emerald.Println()
 	}
 }

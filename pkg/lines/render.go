@@ -2,11 +2,9 @@ package lines
 
 import (
 	"fmt"
-	"github.com/mgutz/ansi"
+	"github.com/jcwillox/emerald"
 	"github.com/spf13/viper"
 	"nfetch/internal/color"
-	. "nfetch/pkg"
-	"nfetch/pkg/ioutils"
 	"strings"
 	"time"
 )
@@ -93,7 +91,7 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 			}
 
 			if showTiming {
-				content = fmt.Sprint(content, ansi.Yellow, " [took ", ansi.Red, time.Since(start), ansi.Yellow, "]", ansi.Reset)
+				content = fmt.Sprint(content, emerald.Yellow, " [took ", emerald.Red, time.Since(start), emerald.Yellow, "]", emerald.Reset)
 			}
 
 			results <- Result{
@@ -109,11 +107,11 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 
 	if logo == nil {
 		// +1 to account for difference between column and character count
-		prefix := CursorRight(offset + 1)
+		prefix := emerald.CursorRightVar(offset + 1)
 		printLine = func(a ...interface{}) {
-			ioutils.Print(prefix)
-			ioutils.Print(a...)
-			ioutils.Println()
+			emerald.Print(prefix)
+			emerald.Print(a...)
+			emerald.Println()
 			writtenLines += 1
 		}
 	} else {
@@ -125,12 +123,12 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 		padding := strings.Repeat(" ", paddingAmt)
 		printLine = func(a ...interface{}) {
 			if len(logo) > writtenLines {
-				ioutils.Print(padding, logo[writtenLines], strings.Repeat(" ", offset-len(logo[writtenLines])))
+				emerald.Print(padding, logo[writtenLines], strings.Repeat(" ", offset-len(logo[writtenLines])))
 			} else {
-				ioutils.Print(padding, strings.Repeat(" ", offset))
+				emerald.Print(padding, strings.Repeat(" ", offset))
 			}
-			ioutils.Print(a...)
-			ioutils.Println()
+			emerald.Print(a...)
+			emerald.Println()
 			writtenLines += 1
 		}
 	}
@@ -147,11 +145,10 @@ func RenderLines(offset int, lines []interface{}, logo []string) int {
 		case LineBlank:
 			printLine()
 		case LineColorbar:
-			if color.NoColor {
-				break
-			}
-			for _, s := range Colorbar() {
-				printLine(s)
+			if emerald.ColorEnabled {
+				for _, s := range Colorbar() {
+					printLine(s)
+				}
 			}
 		case LineDisk:
 			diskResult := <-diskResult

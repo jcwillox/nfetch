@@ -3,13 +3,12 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/jcwillox/emerald"
 	"github.com/k0kubun/pp/v3"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/host"
 	"github.com/spf13/cobra"
 	"net"
-	"nfetch/internal/color"
-	"nfetch/pkg/ioutils"
 	"nfetch/pkg/lines"
 	"nfetch/pkg/sysinfo"
 	"os"
@@ -121,7 +120,7 @@ var rawCmd = &cobra.Command{
 			printInfo(sysinfo.Wallpaper())
 		case lines.LineColorbar:
 			for _, line := range lines.Colorbar() {
-				ioutils.Println(line)
+				emerald.Println(line)
 			}
 		}
 	},
@@ -134,18 +133,18 @@ func printInfo(a interface{}, err ...error) {
 		fmt.Println(result)
 	} else if result, ok := a.(net.IP); ok {
 		fmt.Println(result)
-	} else if color.NoColor {
+	} else if emerald.ColorEnabled {
+		if len(err) > 0 && err[0] != nil {
+			pprint.Println(err[0])
+		} else {
+			pprint.Println(a)
+		}
+	} else {
 		if len(err) > 0 && err[0] != nil {
 			fmt.Fprintln(os.Stderr, "error:", err[0])
 		} else {
 			result, _ := json.MarshalIndent(a, "", "  ")
 			os.Stdout.Write(result)
-		}
-	} else {
-		if len(err) > 0 && err[0] != nil {
-			pprint.Println(err[0])
-		} else {
-			pprint.Println(a)
 		}
 	}
 }
