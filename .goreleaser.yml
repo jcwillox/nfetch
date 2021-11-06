@@ -8,6 +8,7 @@ builds:
   - id: nix
     env:
       - CGO_ENABLED=0
+      - GO386=softfloat
     goos:
       - linux
       # - darwin
@@ -20,10 +21,12 @@ builds:
       - -trimpath
     ldflags:
       - -s -w
+    main: ./nfetch
 
   - id: windows
     env:
       - CGO_ENABLED=0
+      - GO386=softfloat
     goos:
       - windows
     goarch:
@@ -33,6 +36,7 @@ builds:
       - -trimpath
     ldflags:
       - -s -w
+    main: ./nfetch
 
 archives:
   - id: windows
@@ -81,3 +85,6 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+
+release:
+  draft: true

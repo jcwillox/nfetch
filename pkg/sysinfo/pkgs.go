@@ -2,7 +2,7 @@ package sysinfo
 
 import (
 	"bufio"
-	"nfetch/pkg/utils"
+	"github.com/jcwillox/nfetch/pkg/utils"
 	"path/filepath"
 )
 

@@ -2,11 +2,11 @@ package lines
 
 import (
 	"fmt"
+	"github.com/jcwillox/nfetch/internal/color"
+	"github.com/jcwillox/nfetch/pkg/sysinfo"
+	. "github.com/jcwillox/nfetch/pkg/utils"
 	"github.com/shirou/gopsutil/host"
 	"golang.org/x/text/language/display"
-	"nfetch/internal/color"
-	"nfetch/pkg/sysinfo"
-	. "nfetch/pkg/utils"
 	"runtime"
 	"strings"
 )

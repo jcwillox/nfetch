@@ -1,9 +1,10 @@
+//go:build linux
 // +build linux
 
 package sysinfo
 
 import (
-	"nfetch/pkg/utils"
+	"github.com/jcwillox/nfetch/pkg/utils"
 	"strings"
 )
 

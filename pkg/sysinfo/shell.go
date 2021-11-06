@@ -1,8 +1,8 @@
 package sysinfo
 
 import (
+	"github.com/jcwillox/nfetch/pkg/utils"
 	"github.com/shirou/gopsutil/process"
-	"nfetch/pkg/utils"
 	"os"
 	"os/exec"
 	"path/filepath"

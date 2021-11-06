@@ -1,10 +1,11 @@
+//go:build windows
 // +build windows
 
 package lines
 
 import (
 	"fmt"
-	"nfetch/pkg/sysinfo"
+	"github.com/jcwillox/nfetch/pkg/sysinfo"
 )
 
 func Theme(config LineConfig) (string, error) {

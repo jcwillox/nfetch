@@ -1,4 +1,4 @@
-module nfetch
+module github.com/jcwillox/nfetch
 
 go 1.17
 

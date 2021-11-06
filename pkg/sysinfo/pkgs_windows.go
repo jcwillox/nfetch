@@ -1,10 +1,11 @@
+//go:build windows
 // +build windows
 
 package sysinfo
 
 import (
+	"github.com/jcwillox/nfetch/pkg/utils"
 	"github.com/mitchellh/go-homedir"
-	"nfetch/pkg/utils"
 	"os/exec"
 	"path/filepath"
 	"strconv"

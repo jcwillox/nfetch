@@ -3,8 +3,8 @@ package lines
 import (
 	"fmt"
 	"github.com/jcwillox/emerald"
+	"github.com/jcwillox/nfetch/internal/color"
 	"github.com/spf13/viper"
-	"nfetch/internal/color"
 	"strings"
 	"time"
 )

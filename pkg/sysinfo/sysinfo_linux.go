@@ -1,3 +1,4 @@
+//go:build linux
 // +build linux
 
 package sysinfo
@@ -7,10 +8,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/jcwillox/nfetch/pkg/utils"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
 	"net"
-	"nfetch/pkg/utils"
 	"os"
 	"os/exec"
 	"runtime"
