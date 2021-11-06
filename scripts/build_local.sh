@@ -5,7 +5,7 @@ DIR=$(realpath "$(dirname "$0")")
 cd "$DIR/.." || exit
 
 if [[ -z "${WSL_DISTRO_NAME}" ]] || [[ ! $DIR =~ ^/mnt/.* ]] ; then
-  goreleaser --snapshot --skip-publish --rm-dist
+  goreleaser --snapshot --rm-dist
 else
   # on WSL we have to move to a non-windows file system for file permissions to be set correctly
   tmp_dir=$(mktemp -d -t nfetch-XXXXXXXXXX)
@@ -23,7 +23,7 @@ else
   chmod -R 644 ./completions/*
 
   echo "building assets"
-  goreleaser --snapshot --skip-publish --rm-dist
+  goreleaser --snapshot --rm-dist
 
   echo "copying resulting assets"
   cp -R ./dist "$DIR/.."

@@ -1,9 +1,10 @@
 project_name: nfetch
+
 before:
   hooks:
     - go mod tidy
     - go generate ./...
-    - ./scripts/update_bash_completions.sh
+    - task completions
 builds:
   - id: nix
     env:

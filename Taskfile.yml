@@ -1,0 +1,56 @@
+# https://taskfile.dev
+version: "3"
+
+tasks:
+  default:
+    cmds:
+      - go run ./nfetch {{.CLI_ARGS}}
+    silent: true
+
+  run-wsl:
+    desc: "Run inside WSL"
+    cmds:
+      - wsl -e go run ./nfetch {{.CLI_ARGS}}
+    preconditions:
+      - sh: command -v wsl
+        msg: "WSL is not installed"
+      - sh: wsl -- command -v go
+        msg: "go binary is not available in WSL"
+    silent: true
+
+  build:
+    desc: Build local binary
+    vars:
+      GOOS: "{{if .GOOS}}{{.GOOS}}{{else}}{{OS}}{{end}}"
+      GOARCH: "{{if .GOARCH}}{{.GOARCH}}{{else}}{{ARCH}}{{end}}"
+      EXT: "{{if eq .GOOS \"windows\"}}.exe{{else}}{{end}}"
+    cmds:
+      - go build -o "nfetch.{{.GOOS}}.{{.GOARCH}}{{.EXT}}" ./nfetch
+    env:
+      GOOS: "{{.GOOS}}"
+      GOARCH: "{{.GOARCH}}"
+
+  build-all:
+    desc: Build binaries for all configured OS/ARCH
+    cmds:
+      - goreleaser build --rm-dist --snapshot
+
+  completions:
+    desc: Generate bash completions
+    cmds:
+      - go run ./nfetch completion bash > ./completions/nfetch.sh
+
+  test-release:
+    desc: Builds release artifacts with goreleaser
+    cmds:
+      - goreleaser --snapshot --rm-dist
+
+  test-release-linux:
+    desc: Builds release artifacts under Linux/WSL
+    cmds:
+      - bash ./scripts/build_local.sh
+    preconditions:
+      - sh: command -v bash
+        msg: "bash is not installed"
+      - sh: bash -c 'command -v goreleaser'
+        msg: "goreleaser binary is not available in bash"
