@@ -36,9 +36,14 @@ tasks:
       - goreleaser build --rm-dist --snapshot
 
   completions:
-    desc: Generate bash completions
+    desc: Regenerate completion files
     cmds:
-      - go run ./nfetch completion bash > ./completions/nfetch.sh
+      - go build -o nfetch.completions ./nfetch
+      - nfetch.completions completion bash > ./completions/nfetch.bash
+      - nfetch.completions completion zsh > ./completions/nfetch.zsh
+      - nfetch.completions completion fish > ./completions/nfetch.fish
+      - nfetch.completions completion powershell > ./completions/nfetch.ps1
+      - "{{if eq OS \"windows\"}}cmd /c del{{else}}rm{{end}} nfetch.completions"
 
   test-release:
     desc: Builds release artifacts with goreleaser

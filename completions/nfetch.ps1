@@ -1,11 +1,17 @@
 # powershell completion for nfetch                               -*- shell-script -*-
 
-Register-ArgumentCompleter -CommandName 'nfetch' -ScriptBlock {
+$cmdNames = @("nfetch")
+$cmdNames += Get-Alias -Definition $cmdNames -ErrorAction Ignore | ForEach-Object Name
+if ($env:NFETCH_ALIASES) {
+    $cmdNames += $env:NFETCH_ALIASES.Split(",")
+}
+
+Register-ArgumentCompleter -CommandName $cmdNames -ScriptBlock {
     param(
-            $WordToComplete,
-            $CommandAst,
-            $CursorPosition
-        )
+        $WordToComplete,
+        $CommandAst,
+        $CursorPosition
+    )
 
     function __nfetch_debug {
         if ($env:BASH_COMP_DEBUG_FILE) {
@@ -33,7 +39,7 @@ Register-ArgumentCompleter -CommandName 'nfetch' -ScriptBlock {
     if ($Command.Length -gt $CursorPosition) {
         $Command=$Command.Substring(0,$CursorPosition)
     }
-	__nfetch_debug "Truncated command: $Command"
+    __nfetch_debug "Truncated command: $Command"
 
     $ShellCompDirectiveError=1
     $ShellCompDirectiveNoSpace=2
@@ -41,7 +47,7 @@ Register-ArgumentCompleter -CommandName 'nfetch' -ScriptBlock {
     $ShellCompDirectiveFilterFileExt=8
     $ShellCompDirectiveFilterDirs=16
 
-	# Prepare the command to request completions for the program.
+    # Prepare the command to request completions for the program.
     # Split the command at the first space to separate the program and arguments.
     $Program,$Arguments = $Command.Split(" ",2)
     $RequestComp="$Program __complete $Arguments"
@@ -69,7 +75,7 @@ Register-ArgumentCompleter -CommandName 'nfetch' -ScriptBlock {
         # We add an extra empty parameter so we can indicate this to the go method.
         __nfetch_debug "Adding extra empty parameter"
         # We need to use `"`" to pass an empty argument a "" or '' does not work!!!
-        $RequestComp="$RequestComp" + ' `"`"' 
+        $RequestComp="$RequestComp" + ' `"`"'
     }
 
     __nfetch_debug "Calling $RequestComp"
@@ -123,6 +129,25 @@ Register-ArgumentCompleter -CommandName 'nfetch' -ScriptBlock {
         $Space = ""
     }
 
+    if ((($Directive -band $ShellCompDirectiveFilterFileExt) -ne 0 ) -or
+            (($Directive -band $ShellCompDirectiveFilterDirs) -ne 0 ))  {
+        __nfetch_debug "ShellCompDirectiveFilterFileExt ShellCompDirectiveFilterDirs are not supported"
+
+        # return here to prevent the completion of the extensions
+        return
+    }
+
+    $Values = $Values | Where-Object {
+        # filter the result
+        $_.Name -like "$WordToComplete*"
+
+        # Join the flag back if we have an equal sign flag
+        if ( $IsEqualFlag ) {
+            __nfetch_debug "Join the equal sign flag back to the completion value"
+            $_.Name = $Flag + "=" + $_.Name
+        }
+    }
+
     if (($Directive -band $ShellCompDirectiveNoFileComp) -ne 0 ) {
         __nfetch_debug "ShellCompDirectiveNoFileComp is called"
 
@@ -136,32 +161,13 @@ Register-ArgumentCompleter -CommandName 'nfetch' -ScriptBlock {
         }
     }
 
-    if ((($Directive -band $ShellCompDirectiveFilterFileExt) -ne 0 ) -or
-       (($Directive -band $ShellCompDirectiveFilterDirs) -ne 0 ))  {
-        __nfetch_debug "ShellCompDirectiveFilterFileExt ShellCompDirectiveFilterDirs are not supported"
-
-        # return here to prevent the completion of the extensions
-        return
-    }
-
-    $Values = $Values | Where-Object {
-        # filter the result
-        $_.Name -like "$WordToComplete*"
-
-        # Join the flag back if we have a equal sign flag
-        if ( $IsEqualFlag ) {
-            __nfetch_debug "Join the equal sign flag back to the completion value"
-            $_.Name = $Flag + "=" + $_.Name
-        }
-    }
-
     # Get the current mode
     $Mode = (Get-PSReadLineKeyHandler | Where-Object {$_.Key -eq "Tab" }).Function
     __nfetch_debug "Mode: $Mode"
 
     $Values | ForEach-Object {
 
-        # store temporay because switch will overwrite $_
+        # store temporary because switch will overwrite $_
         $comp = $_
 
         # PowerShell supports three different completion modes
@@ -202,7 +208,7 @@ Register-ArgumentCompleter -CommandName 'nfetch' -ScriptBlock {
 
                     [System.Management.Automation.CompletionResult]::new("$($comp.Name)$Description", "$($comp.Name)$Description", 'ParameterValue', "$($comp.Description)")
                 }
-             }
+            }
 
             # zsh like
             "MenuComplete" {
@@ -216,7 +222,7 @@ Register-ArgumentCompleter -CommandName 'nfetch' -ScriptBlock {
             Default {
                 # Like MenuComplete but we don't want to add a space here because
                 # the user need to press space anyway to get the completion.
-                # Description will not be shown because thats not possible with TabCompleteNext
+                # Description will not be shown because that's not possible with TabCompleteNext
                 [System.Management.Automation.CompletionResult]::new($($comp.Name | __nfetch_escapeStringWithSpecialChars), "$($comp.Name)", 'ParameterValue', "$($comp.Description)")
             }
         }

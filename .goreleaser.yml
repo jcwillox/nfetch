@@ -56,7 +56,7 @@ archives:
     files:
       - completions/nfetch.zsh
       - completions/nfetch.fish
-      - completions/nfetch.sh
+      - completions/nfetch.bash
 
 nfpms:
   - license: MIT
@@ -73,7 +73,7 @@ nfpms:
         dst: /usr/share/zsh/vendor-completions/_nfetch
       - src: completions/nfetch.fish
         dst: /usr/share/fish/vendor_completions.d/nfetch.fish
-      - src: completions/nfetch.sh
+      - src: completions/nfetch.bash
         dst: /etc/bash_completion.d/nfetch
 
 checksum:
