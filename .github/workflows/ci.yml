@@ -1,0 +1,63 @@
+name: "CI"
+
+on:
+  push:
+    branches:
+      - "main"
+      - "feat**"
+    tags-ignore:
+      - "**"
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout the repository"
+        uses: actions/checkout@v2
+
+      - name: "Extract engines"
+        id: engines
+        uses: ./.github/actions/engines
+
+      - name: "Setup go"
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ steps.engines.outputs.go }}
+
+      - name: "Check format"
+        run: gofmt -l .
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout the repository"
+        uses: actions/checkout@v2
+
+      - name: "Extract engines"
+        id: engines
+        uses: ./.github/actions/engines
+
+      - name: "Setup go"
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ steps.engines.outputs.go }}
+
+      - name: "Cache dependencies"
+        uses: actions/cache@v2
+        if: "!env.ACT"
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: "Run GoReleaser"
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: build --rm-dist --snapshot
