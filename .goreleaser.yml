@@ -1,10 +1,13 @@
-project_name: nfetch
-
 before:
   hooks:
     - go mod tidy
-    - go generate ./...
-    - task completions
+
+snapshot:
+  name_template: "{{ .Version }}"
+
+checksum:
+  name_template: 'checksums.txt'
+
 builds:
   - id: nix
     env:
@@ -14,7 +17,7 @@ builds:
       - linux
       # - darwin
     goarch:
-      - 386
+      - "386"
       - amd64
       - arm
       - arm64
@@ -31,7 +34,7 @@ builds:
     goos:
       - windows
     goarch:
-      - 386
+      - "386"
       - amd64
     flags:
       - -trimpath
@@ -57,9 +60,16 @@ archives:
       - completions/nfetch.zsh
       - completions/nfetch.fish
       - completions/nfetch.bash
+    replacements:
+      386: i386
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 
 nfpms:
-  - license: MIT
+  - file_name_template: '{{ .PackageName }}_{{ .Version }}_{{ .Arch }}'
+    replacements:
+      386:
+        i386
+    license: MIT
     maintainer: Joshua Cowie-Willox <joshwillox@gmail.com>
     homepage: https://github.com/jcwillox/nfetch
     description: "A modern neofetch alternative"
@@ -75,17 +85,3 @@ nfpms:
         dst: /usr/share/fish/vendor_completions.d/nfetch.fish
       - src: completions/nfetch.bash
         dst: /etc/bash_completion.d/nfetch
-
-checksum:
-  name_template: 'checksums.txt'
-snapshot:
-  name_template: "{{ .Version }}"
-changelog:
-  sort: asc
-  filters:
-    exclude:
-      - '^docs:'
-      - '^test:'
-
-release:
-  draft: true
