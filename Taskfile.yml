@@ -31,9 +31,14 @@ tasks:
       GOARCH: "{{.GOARCH}}"
 
   build-all:
-    desc: Build binaries for all configured OS/ARCH
+    desc: Build binaries for all platforms
     cmds:
       - goreleaser build --rm-dist --snapshot
+
+  clean:
+    desc: Remove temporary files
+    cmds:
+      - python ./scripts/clean.py
 
   completions:
     desc: Regenerate completion files
