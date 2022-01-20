@@ -8,7 +8,7 @@ require (
 	github.com/anthonynsimon/bild v0.13.0
 	github.com/distatus/battery v0.10.0
 	github.com/jcwillox/emerald v0.2.0
-	github.com/k0kubun/pp/v3 v3.0.7
+	github.com/k0kubun/pp/v3 v3.1.0
 	github.com/kbinani/screenshot v0.0.0-20210326165202-b96eb3309bb0
 	github.com/miekg/dns v1.1.42
 	github.com/mitchellh/go-homedir v1.1.0
@@ -18,7 +18,7 @@ require (
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.1
-	golang.org/x/sys v0.0.0-20211210111614-af8b64212486
+	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9
 	golang.org/x/text v0.3.7
 )
 
@@ -52,8 +52,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	howett.net/plist v0.0.0-20201203080718-1454fab16a06 // indirect
 )
-
-replace github.com/k0kubun/pp/v3 v3.0.7 => github.com/k0kubun/pp/v3 v3.0.8-0.20210415165650-b87d88f85b84
 
 replace (
 	github.com/StackExchange/wmi => github.com/bi-zone/wmi v1.1.4

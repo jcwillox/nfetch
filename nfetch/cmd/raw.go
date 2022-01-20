@@ -15,7 +15,6 @@ import (
 	"strings"
 )
 
-var pprint *pp.PrettyPrinter
 var rawArgs = []string{
 	lines.LineTitle,
 	"distro",
@@ -57,9 +56,6 @@ var rawCmd = &cobra.Command{
 		"Info": strings.Join(rawArgs, ", "),
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		pprint = pp.New()
-		pprint.SetDecimalUint(true)
-
 		switch args[0] {
 		case lines.LineTitle:
 			printInfo(lines.Title())
@@ -135,9 +131,9 @@ func printInfo(a interface{}, err ...error) {
 		fmt.Println(result)
 	} else if emerald.ColorEnabled {
 		if len(err) > 0 && err[0] != nil {
-			pprint.Println(err[0])
+			pp.Println(err[0])
 		} else {
-			pprint.Println(a)
+			pp.Println(a)
 		}
 	} else {
 		if len(err) > 0 && err[0] != nil {
