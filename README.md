@@ -17,7 +17,7 @@ You can download prebuilt binaries as well as OS packages (e.g. `.deb`) from the
 Note: the installer script does not install completions, you can generate them using `nfetch completion <shell>`.
 
 ```bash
-sh -c "$(curl -fsSL tinyurl.com/nfetch)"
+sh -c "$(curl -fsSL tinyurl.com/nfetch-sh)"
 ```
 
 ```pwsh
